@@ -1,7 +1,7 @@
 import { html } from 'lit';
-import './wc-toast.js';
+import './beam-toast.js';
 import type { Preview } from '../../preview/types.js';
-import type { ToastDetail } from './wc-toast.js';
+import type { ToastDetail } from './beam-toast.js';
 
 /**
  * Long enough to hold still while a state is being looked at, and short of
@@ -14,11 +14,11 @@ const seeded = (initial: ToastDetail | ToastDetail[]) => {
     duration: PREVIEW_DURATION_MS,
     ...detail,
   }));
-  return html`<wc-toast .initial=${held}></wc-toast>`;
+  return html`<beam-toast .initial=${held}></beam-toast>`;
 };
 
 const preview: Preview = {
-  id: 'wc-toast',
+  id: 'beam-toast',
   title: 'Toast',
   group: 'Feedback',
   description:
@@ -27,7 +27,7 @@ const preview: Preview = {
   states: [
     {
       name: 'info',
-      render: () => seeded({ message: 'Rules re-applied.' } satisfies ToastDetail),
+      render: () => seeded({ message: 'Changes re-applied.' } satisfies ToastDetail),
     },
     {
       name: 'success',
@@ -49,7 +49,7 @@ const preview: Preview = {
       name: 'with-action',
       render: () =>
         seeded({
-          message: 'Import undone.',
+          message: 'Upload undone.',
           action: { label: 'Redo', onClick: () => {} },
         } satisfies ToastDetail),
     },
@@ -58,7 +58,7 @@ const preview: Preview = {
       render: () =>
         seeded({
           message:
-            'The category "Office Supplies" could not be deleted because 37 transactions still reference it, and every one of them would be left without a category.',
+            'The label "Office Supplies" could not be deleted because 37 items still use it, and every one of them would be left without a label.',
           variant: 'danger',
         } satisfies ToastDetail),
     },
@@ -75,10 +75,10 @@ const preview: Preview = {
       name: 'stacked',
       render: () =>
         seeded([
-          { message: 'Rules re-applied.' },
+          { message: 'Changes re-applied.' },
           { message: '42 transactions imported.', variant: 'success' },
           {
-            message: 'Import undone.',
+            message: 'Upload undone.',
             action: { label: 'Redo', onClick: () => {} },
           },
         ] satisfies ToastDetail[]),

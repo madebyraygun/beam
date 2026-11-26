@@ -194,7 +194,7 @@ export class PreviewApp extends LitElement {
 
   /**
    * The harness's own control, deliberately plain buttons rather than
-   * `wc-mode-switcher`. The harness is chrome around the components, and
+   * a mode switcher component. The harness is chrome around the components, and
    * reviewing a component while an instance of it drives the page it is
    * rendered on is a confusing way to look at anything.
    */

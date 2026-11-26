@@ -5,7 +5,7 @@ describe('extract', () => {
   it('reads id, title, group and state names from a typed const', () => {
     const source = `
       const preview: Preview = {
-        id: 'wc-money',
+        id: 'demo-widget',
         title: 'Money',
         group: 'Data',
         states: [{ name: 'positive' }, { name: 'negative' }],
@@ -13,7 +13,7 @@ describe('extract', () => {
       export default preview;
     `;
     expect(extract(source)).toEqual({
-      id: 'wc-money',
+      id: 'demo-widget',
       title: 'Money',
       group: 'Data',
       states: ['positive', 'negative'],

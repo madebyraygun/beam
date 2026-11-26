@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import './wc-monogram.js';
+import './beam-monogram.js';
 import type { Preview } from '../../preview/types.js';
 
 const CAST = [
@@ -16,7 +16,7 @@ const row = (size: 's' | 'l') => html`
     ${CAST.map(
       (name) =>
         html`<span style="display:inline-flex;align-items:center;gap:8px;">
-          <wc-monogram name=${name} seed=${name} size=${size}></wc-monogram>
+          <beam-monogram name=${name} seed=${name} size=${size}></beam-monogram>
           <span>${name}</span>
         </span>`,
     )}
@@ -24,7 +24,7 @@ const row = (size: 's' | 'l') => html`
 `;
 
 const preview: Preview = {
-  id: 'wc-monogram',
+  id: 'beam-monogram',
   title: 'Monogram',
   group: 'Layout',
   description:

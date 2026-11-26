@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
-import './wc-toast.js';
-import { dispatchToast, MAX_VISIBLE_TOASTS, WcToast } from './wc-toast.js';
+import './beam-toast.js';
+import { dispatchToast, MAX_VISIBLE_TOASTS, BeamToast } from './beam-toast.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { styleText } from '../../preview/style-text.js';
@@ -13,30 +13,30 @@ import {
   type Viewport,
 } from '../../preview/css-geometry.js';
 import { defaultTheme } from '../theme/index.js';
-import preview from './wc-toast.preview.js';
+import preview from './beam-toast.preview.js';
 
-async function mount(): Promise<WcToast> {
-  const el = document.createElement('wc-toast');
+async function mount(): Promise<BeamToast> {
+  const el = document.createElement('beam-toast');
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
 }
 
-function toastEl(el: WcToast): HTMLElement | null {
+function toastEl(el: BeamToast): HTMLElement | null {
   return el.shadowRoot?.querySelector('.toast') ?? null;
 }
 
-function messages(el: WcToast): string[] {
+function messages(el: BeamToast): string[] {
   return [...(el.shadowRoot?.querySelectorAll('.toast .message') ?? [])].map((node) =>
     (node.textContent ?? '').trim(),
   );
 }
 
-function region(el: WcToast): HTMLElement | null {
+function region(el: BeamToast): HTMLElement | null {
   return el.shadowRoot?.querySelector('[data-toast-region]') ?? null;
 }
 
-describe('wc-toast', () => {
+describe('beam-toast', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.useRealTimers();
@@ -182,7 +182,7 @@ describe('wc-toast', () => {
   });
 
   it('seeds a toast from .initial', async () => {
-    const el = document.createElement('wc-toast');
+    const el = document.createElement('beam-toast');
     el.initial = { message: 'Seeded.', duration: 0 };
     document.body.appendChild(el);
     await el.updateComplete;
@@ -190,7 +190,7 @@ describe('wc-toast', () => {
   });
 
   it('seeds a whole stack from .initial', async () => {
-    const el = document.createElement('wc-toast');
+    const el = document.createElement('beam-toast');
     el.initial = [
       { message: 'First.', duration: 0 },
       { message: 'Second.', duration: 0 },
@@ -201,14 +201,14 @@ describe('wc-toast', () => {
   });
 });
 
-describe('wc-toast dismissal', () => {
+describe('beam-toast dismissal', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
-  function closeButton(el: WcToast): HTMLButtonElement | null {
+  function closeButton(el: BeamToast): HTMLButtonElement | null {
     return el.shadowRoot?.querySelector<HTMLButtonElement>('[data-toast-close]') ?? null;
   }
 
@@ -237,7 +237,7 @@ describe('wc-toast dismissal', () => {
   it('leaves the close button off a sticky toast whose action ends it', async () => {
     const el = await mount();
     dispatchToast(el, {
-      message: 'Import undone.',
+      message: 'Upload undone.',
       duration: 0,
       action: { label: 'Redo', onClick: () => {} },
     });
@@ -274,7 +274,7 @@ describe('wc-toast dismissal', () => {
  * the top layer is ordered by open time, and a re-show jumps the region above
  * whatever opened since.
  */
-describe('wc-toast top-layer promotion', () => {
+describe('beam-toast top-layer promotion', () => {
   let calls: string[] = [];
 
   function trackPopover(): void {
@@ -375,7 +375,7 @@ describe('wc-toast top-layer promotion', () => {
   });
 });
 
-describe('wc-toast stacking', () => {
+describe('beam-toast stacking', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.useRealTimers();
@@ -449,8 +449,8 @@ describe('wc-toast stacking', () => {
  * viewport pixels — see `preview/css-geometry.ts` — and assert the resulting
  * boxes, not the declarations that produced them.
  */
-describe('wc-toast placement', () => {
-  const css = styleText(WcToast);
+describe('beam-toast placement', () => {
+  const css = styleText(BeamToast);
   // The theme's tokens are in scope wherever the component renders; the
   // component's own :host knobs sit on top of them.
   const vars = {
@@ -536,4 +536,4 @@ describe('wc-toast placement', () => {
 
 describePreviewA11y(preview);
 
-describePrintHiding(WcToast, ':host');
+describePrintHiding(BeamToast, ':host');

@@ -1,19 +1,19 @@
-export { WcAppShell, narrowViewport } from './wc-app-shell.js';
-export { WcNavSidebar, type NavItem } from './wc-nav-sidebar.js';
+export { BeamAppShell, narrowViewport } from './beam-app-shell.js';
+export { BeamNavSidebar, type NavItem } from './beam-nav-sidebar.js';
 export {
-  WcBreadcrumb,
+  BeamBreadcrumb,
   dispatchPaletteOpen,
   type BreadcrumbItem,
   type PaletteOpenDetail,
   type PaletteScope,
-} from './wc-breadcrumb.js';
-export { WcStatusLine, type StatusSegment } from './wc-status-line.js';
-export { WcSearchPill } from './wc-search-pill.js';
-export { WcMonogram, monogramInitials, monogramTone } from './wc-monogram.js';
+} from './beam-breadcrumb.js';
+export { BeamStatusLine, type StatusSegment } from './beam-status-line.js';
+export { BeamSearchPill } from './beam-search-pill.js';
+export { BeamMonogram, monogramInitials, monogramTone } from './beam-monogram.js';
 export {
-  WcToast,
+  BeamToast,
   dispatchToast,
   type ToastAction,
   type ToastDetail,
   type ToastVariant,
-} from './wc-toast.js';
+} from './beam-toast.js';

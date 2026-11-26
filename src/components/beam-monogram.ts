@@ -44,8 +44,8 @@ export function monogramTone(seed: string): number {
  * colour; a caller passes whatever identifies the thing for good. Decorative — the name is always printed beside it — so it is
  * hidden from assistive tech.
  */
-@customElement('wc-monogram')
-export class WcMonogram extends LitElement {
+@customElement('beam-monogram')
+export class BeamMonogram extends LitElement {
   static styles = css`
     :host {
       --beam-monogram-size: 20px;
@@ -119,6 +119,6 @@ export class WcMonogram extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-monogram': WcMonogram;
+    'beam-monogram': BeamMonogram;
   }
 }

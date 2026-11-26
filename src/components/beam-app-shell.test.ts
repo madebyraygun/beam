@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import './wc-app-shell.js';
-import { WcAppShell, type NarrowQuery } from './wc-app-shell.js';
-import { dispatchToast } from './wc-toast.js';
+import './beam-app-shell.js';
+import { BeamAppShell, type NarrowQuery } from './beam-app-shell.js';
+import { dispatchToast } from './beam-toast.js';
 import { demoSegments } from './__mocks__/status.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
@@ -12,35 +12,35 @@ import {
   printedBox,
   resolvedBox,
 } from '../../preview/layout-suite.js';
-import preview from './wc-app-shell.preview.js';
+import preview from './beam-app-shell.preview.js';
 
 /** Everything the shell adopts into its shadow root. */
-const text = styleText(WcAppShell);
+const text = styleText(BeamAppShell);
 
-async function mount(props: Partial<WcAppShell> = {}): Promise<WcAppShell> {
-  const el = document.createElement('wc-app-shell');
+async function mount(props: Partial<BeamAppShell> = {}): Promise<BeamAppShell> {
+  const el = document.createElement('beam-app-shell');
   Object.assign(el, props);
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
 }
 
-describe('wc-app-shell', () => {
+describe('beam-app-shell', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
   it('renders the screen title as the page heading', async () => {
-    const el = await mount({ screenTitle: 'Register' });
+    const el = await mount({ screenTitle: 'Items' });
     const heading = el.shadowRoot?.querySelector('h1');
-    expect(heading?.textContent).toBe('Register');
+    expect(heading?.textContent).toBe('Items');
     expect(heading?.closest('main')).toBeTruthy();
   });
 
   it('keeps a hidden title as a heading for assistive technology, outside the page head', async () => {
-    const el = await mount({ screenTitle: 'Register', titleHidden: true });
+    const el = await mount({ screenTitle: 'Items', titleHidden: true });
     const heading = el.shadowRoot?.querySelector('h1');
-    expect(heading?.textContent).toBe('Register');
+    expect(heading?.textContent).toBe('Items');
     expect(heading?.classList.contains('title-hidden')).toBe(true);
     expect(heading?.closest('main')).toBeTruthy();
     expect(el.shadowRoot?.querySelector('[part="page-head"]')).toBeNull();
@@ -82,12 +82,12 @@ describe('wc-app-shell', () => {
 
   it('hosts exactly one toast region', async () => {
     const el = await mount();
-    expect(el.shadowRoot?.querySelectorAll('wc-toast').length).toBe(1);
+    expect(el.shadowRoot?.querySelectorAll('beam-toast').length).toBe(1);
   });
 
   it('shows toasts dispatched from its content', async () => {
     const el = await mount();
-    const toast = el.shadowRoot?.querySelector('wc-toast');
+    const toast = el.shadowRoot?.querySelector('beam-toast');
     await toast?.updateComplete;
 
     dispatchToast(el, { message: 'Saved.' });
@@ -120,30 +120,30 @@ describe('wc-app-shell', () => {
 
 describePreviewA11y(preview);
 
-describeColumnLayout(WcAppShell, '.content');
+describeColumnLayout(BeamAppShell, '.content');
 
-describePrintsAsBlock(WcAppShell, '.content');
+describePrintsAsBlock(BeamAppShell, '.content');
 
 describe('the content area', () => {
   it('gives the screen the whole of it', () => {
     // The screen is the only thing in the default slot; whether anything on it
     // can be centred vertically is decided by how tall the screen is allowed
     // to be, which is here and nowhere else.
-    expect(resolvedBox(WcAppShell, '.content ::slotted(*)').flexGrow).toBe('1');
+    expect(resolvedBox(BeamAppShell, '.content ::slotted(*)').flexGrow).toBe('1');
   });
 });
 
 describePrintHiding(
-  WcAppShell,
+  BeamAppShell,
   'header',
   '.banner',
   '.page-head',
   "::slotted([slot='sidebar'])",
 );
 
-describe('wc-app-shell content area', () => {
+describe('beam-app-shell content area', () => {
   it('lets a screen ask for the whole window below the header', () => {
-    // The register is the screen that needs this: its table has to end at the
+    // A table screen is the one that needs this: its table has to end at the
     // bottom of the window rather than partway down it. A block content area
     // gives a slotted screen no height to divide up, so `flex: 1` on the
     // screen's own host would have nothing to grow into.
@@ -174,10 +174,10 @@ describe('wc-app-shell content area', () => {
   });
 });
 
-describe('wc-app-shell on paper', () => {
+describe('beam-app-shell on paper', () => {
   it('gives the whole page over to the content', () => {
     // On screen the shell is a 100vh flex box with a scrolling main. On paper
-    // that clamps a ten-page report to one viewport-high box and throws the
+    // that clamps a ten-page table to one viewport-high box and throws the
     // rest away, so both the clamp and the scroll have to come off.
     expect(text).toMatch(/@media print[\s\S]*\.content[^{]*{[^}]*overflow:\s*visible/);
     expect(text).toMatch(/@media print[\s\S]*\.content[^{]*{[^}]*padding:\s*0/);
@@ -189,13 +189,13 @@ describe('wc-app-shell on paper', () => {
     // A sheet has none to hand out, and a flex container is not required to
     // fragment — Safari and older Chromium slice through a row rather than
     // break between two.
-    expect(printedBox(WcAppShell, '.content ::slotted(*)').display).toBe('block');
+    expect(printedBox(BeamAppShell, '.content ::slotted(*)').display).toBe('block');
   });
 
   it('keeps the parts it exposes', () => {
     // the app is one boundary away and can still use them; they are cheap
     // and documented. What changed is that print no longer depends on them.
-    const html = WcAppShell.prototype.render.toString();
+    const html = BeamAppShell.prototype.render.toString();
     for (const part of ['sidebar', 'header', 'banner', 'content']) {
       expect(html).toContain(`part="${part}"`);
     }
@@ -215,11 +215,11 @@ function viewport(narrow: boolean): NarrowQuery {
   };
 }
 
-function toggleOf(el: WcAppShell): HTMLButtonElement | null {
+function toggleOf(el: BeamAppShell): HTMLButtonElement | null {
   return el.shadowRoot?.querySelector('.nav-toggle') ?? null;
 }
 
-describe('wc-app-shell sidebar toggle', () => {
+describe('beam-app-shell sidebar toggle', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -285,7 +285,7 @@ describe('wc-app-shell sidebar toggle', () => {
   });
 });
 
-describe('wc-app-shell drawer', () => {
+describe('beam-app-shell drawer', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -344,7 +344,7 @@ describe('wc-app-shell drawer', () => {
 
     sidebar.dispatchEvent(
       new CustomEvent('beam-navigate', {
-        detail: { id: 'register' },
+        detail: { id: 'items' },
         bubbles: true,
         composed: true,
       }),
@@ -367,7 +367,7 @@ describe('wc-app-shell drawer', () => {
 
     sidebar.dispatchEvent(
       new CustomEvent('beam-navigate', {
-        detail: { id: 'register' },
+        detail: { id: 'items' },
         bubbles: true,
         composed: true,
       }),
@@ -399,11 +399,11 @@ describe('wc-app-shell drawer', () => {
   });
 });
 
-describe('wc-app-shell on a phone', () => {
+describe('beam-app-shell on a phone', () => {
   it('takes the sidebar out of the flow and lays it over the content', () => {
     // Docked, the sidebar is 224px of a 390px viewport and the content is left
     // with a 40-character column. jsdom has no layout engine, so the rules are
-    // read the way the register's fill rules are.
+    // read from the stylesheet text.
     expect(text).toMatch(
       /@media \(max-width: 48rem\)[\s\S]*::slotted\(\[slot='sidebar'\]\)[^{]*{[^}]*position:\s*fixed/,
     );
@@ -427,15 +427,15 @@ describe('wc-app-shell on a phone', () => {
   });
 });
 
-describe('wc-app-shell top bar', () => {
+describe('beam-app-shell top bar', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
   it('hands the workspace and the trail to the breadcrumb', async () => {
-    const trail = [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }];
+    const trail = [{ label: 'Orders', id: 'orders' }, { label: '#1254' }];
     const el = await mount({ workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme', trail });
-    const crumb = el.shadowRoot?.querySelector('wc-breadcrumb');
+    const crumb = el.shadowRoot?.querySelector('beam-breadcrumb');
     expect(crumb?.workspaceName).toBe('Acme Consulting LLC');
     expect(crumb?.workspaceKey).toBe('acme');
     expect(crumb?.trail).toEqual(trail);
@@ -444,9 +444,9 @@ describe('wc-app-shell top bar', () => {
   it('sits the breadcrumb, the search pill and refresh in the header', async () => {
     const el = await mount();
     const header = el.shadowRoot?.querySelector('header');
-    expect(header?.querySelector('wc-breadcrumb')).toBeTruthy();
-    expect(header?.querySelector('wc-search-pill')).toBeTruthy();
-    expect(header?.querySelector('button.refresh[aria-label="Refresh"] wc-icon-refresh')).toBeTruthy();
+    expect(header?.querySelector('beam-breadcrumb')).toBeTruthy();
+    expect(header?.querySelector('beam-search-pill')).toBeTruthy();
+    expect(header?.querySelector('button.refresh[aria-label="Refresh"] beam-icon-refresh')).toBeTruthy();
   });
 
   it('asks for a refresh rather than doing one', async () => {
@@ -459,13 +459,13 @@ describe('wc-app-shell top bar', () => {
 
   it('passes the shortcut on to the search pill', async () => {
     const el = await mount({ searchShortcut: 'Ctrl K', searchKeyShortcuts: 'Control+K' });
-    const pill = el.shadowRoot?.querySelector('wc-search-pill');
+    const pill = el.shadowRoot?.querySelector('beam-search-pill');
     expect(pill?.shortcut).toBe('Ctrl K');
     expect(pill?.keyShortcuts).toBe('Control+K');
   });
 });
 
-describe('wc-app-shell scroll', () => {
+describe('beam-app-shell scroll', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -476,7 +476,7 @@ describe('wc-app-shell scroll', () => {
     if (!content) throw new Error('no content area');
     content.scrollTop = 240;
 
-    el.scrollKey = 'register';
+    el.scrollKey = 'items';
     await el.updateComplete;
 
     expect(content.scrollTop).toBe(0);
@@ -495,7 +495,7 @@ describe('wc-app-shell scroll', () => {
   });
 });
 
-describe('wc-app-shell without a sidebar', () => {
+describe('beam-app-shell without a sidebar', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -511,8 +511,8 @@ describe('wc-app-shell without a sidebar', () => {
 
   it('keeps the breadcrumb and the top bar', async () => {
     const el = await mount({ hideSidebar: true, workspaceName: 'Acme Consulting LLC' });
-    expect(el.shadowRoot?.querySelector('header wc-breadcrumb')).toBeTruthy();
-    expect(el.shadowRoot?.querySelector('header wc-search-pill')).toBeTruthy();
+    expect(el.shadowRoot?.querySelector('header beam-breadcrumb')).toBeTruthy();
+    expect(el.shadowRoot?.querySelector('header beam-search-pill')).toBeTruthy();
   });
 
   it('never draws the drawer backdrop', async () => {
@@ -525,7 +525,7 @@ describe('wc-app-shell without a sidebar', () => {
   });
 });
 
-describe('wc-app-shell status line', () => {
+describe('beam-app-shell status line', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -534,7 +534,7 @@ describe('wc-app-shell status line', () => {
 
   it('draws the status line below the content from what it is handed', async () => {
     const el = await mount({ workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme', statusSegments: segments });
-    const line = el.shadowRoot?.querySelector('main + wc-status-line');
+    const line = el.shadowRoot?.querySelector('main + beam-status-line');
     expect(line?.getAttribute('workspace-name')).toBe('Acme Consulting LLC');
     expect(line?.getAttribute('workspace-key')).toBe('acme');
     expect((line as unknown as { segments: unknown }).segments).toBe(segments);
@@ -542,11 +542,11 @@ describe('wc-app-shell status line', () => {
 
   it('draws none when it is handed nothing, as in a hosted window', async () => {
     const el = await mount({ hideSidebar: true });
-    expect(el.shadowRoot?.querySelector('wc-status-line')).toBeNull();
+    expect(el.shadowRoot?.querySelector('beam-status-line')).toBeNull();
   });
 
   it('draws the line with the name alone for an empty list', async () => {
     const el = await mount({ workspaceName: 'Example board', statusSegments: [] });
-    expect(el.shadowRoot?.querySelector('wc-status-line')).not.toBeNull();
+    expect(el.shadowRoot?.querySelector('beam-status-line')).not.toBeNull();
   });
 });

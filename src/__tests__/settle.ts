@@ -1,6 +1,6 @@
 /**
  * Awaiting a component's `updateComplete` says nothing about the components it
- * rendered: a `wc-icon-*` inside a freshly rendered shadow root has not drawn
+ * rendered: a `beam-icon-*` inside a freshly rendered shadow root has not drawn
  * its own SVG yet. Anything asserting on an icon's insides has to wait for the
  * icon too, which is what this is for.
  */

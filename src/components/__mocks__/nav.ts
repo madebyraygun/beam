@@ -1,21 +1,22 @@
-import type { NavItem } from '../wc-nav-sidebar.js';
+import type { NavItem } from '../beam-nav-sidebar.js';
+import './icons.js';
 
 /** A nav list shaped like the app's real one, for previews and tests. */
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'wc-icon-dashboard' },
-  { id: 'register', label: 'Register', icon: 'wc-icon-register' },
-  { id: 'review', label: 'Review', icon: 'wc-icon-review', count: 84 },
-  { id: 'reports', label: 'Reports', icon: 'wc-icon-report' },
-  { id: 'import', label: 'Import', icon: 'wc-icon-import', group: 'Statements' },
-  { id: 'reconcile', label: 'Reconcile', icon: 'wc-icon-reconcile', group: 'Statements' },
-  { id: 'undo', label: 'Undo', icon: 'wc-icon-undo', group: 'Statements' },
-  { id: 'clients', label: 'Clients', icon: 'wc-icon-clients', group: 'Billing' },
-  { id: 'invoices', label: 'Invoices', icon: 'wc-icon-invoice', group: 'Billing' },
-  { id: 'documents', label: 'Documents', icon: 'wc-icon-edit', group: 'Billing' },
-  { id: 'accounts', label: 'Accounts', icon: 'wc-icon-account', group: 'Setup' },
-  { id: 'categories', label: 'Categories', icon: 'wc-icon-category', group: 'Setup' },
-  { id: 'rules', label: 'Rules', icon: 'wc-icon-rule', group: 'Setup' },
-  { id: 'settings', label: 'Settings', icon: 'wc-icon-settings', pinned: true },
+  { id: 'dashboard', label: 'Dashboard', icon: 'beam-icon-dashboard' },
+  { id: 'items', label: 'Items', icon: 'demo-icon-items' },
+  { id: 'inbox', label: 'Inbox', icon: 'demo-icon-inbox', count: 84 },
+  { id: 'activity', label: 'Activity', icon: 'demo-icon-activity' },
+  { id: 'uploads', label: 'Uploads', icon: 'demo-icon-uploads', group: 'Data' },
+  { id: 'checks', label: 'Checks', icon: 'demo-icon-checks', group: 'Data' },
+  { id: 'undo', label: 'Undo', icon: 'demo-icon-undo', group: 'Data' },
+  { id: 'people', label: 'People', icon: 'demo-icon-people', group: 'Work' },
+  { id: 'orders', label: 'Orders', icon: 'demo-icon-orders', group: 'Work' },
+  { id: 'documents', label: 'Documents', icon: 'demo-icon-documents', group: 'Work' },
+  { id: 'sources', label: 'Sources', icon: 'demo-icon-sources', group: 'Setup' },
+  { id: 'labels', label: 'Labels', icon: 'demo-icon-labels', group: 'Setup' },
+  { id: 'automations', label: 'Automations', icon: 'demo-icon-automations', group: 'Setup' },
+  { id: 'settings', label: 'Settings', icon: 'demo-icon-settings', pinned: true },
 ];
 
 export const NAV_ITEMS_WITH_DISABLED: NavItem[] = NAV_ITEMS.map((item) =>

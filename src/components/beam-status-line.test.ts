@@ -1,22 +1,22 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import './wc-status-line.js';
-import { WcStatusLine } from './wc-status-line.js';
+import './beam-status-line.js';
+import { BeamStatusLine } from './beam-status-line.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
 import { styleText } from '../../preview/style-text.js';
-import preview from './wc-status-line.preview.js';
+import preview from './beam-status-line.preview.js';
 import { demoSegments, type DemoStatus } from './__mocks__/status.js';
 
 /** Mount the line with an example app's segments, built from these values. */
-async function mount(props: DemoStatus & { workspaceName?: string; workspaceKey?: string } = {}): Promise<WcStatusLine> {
-  const el = document.createElement('wc-status-line');
+async function mount(props: DemoStatus & { workspaceName?: string; workspaceKey?: string } = {}): Promise<BeamStatusLine> {
+  const el = document.createElement('beam-status-line');
   const { workspaceName = 'Acme Consulting LLC', workspaceKey = 'acme', ...status } = props;
   el.workspaceName = workspaceName;
   el.workspaceKey = workspaceKey;
   el.segments = demoSegments({
     path: '~/work/acme-consulting',
     version: '1.0',
-    reviewCount: 84,
+    waitingCount: 84,
     ...status,
   });
   document.body.appendChild(el);
@@ -24,9 +24,9 @@ async function mount(props: DemoStatus & { workspaceName?: string; workspaceKey?
   return el;
 }
 
-const text = (el: WcStatusLine): string => el.shadowRoot?.textContent?.replace(/\s+/g, ' ') ?? '';
+const text = (el: BeamStatusLine): string => el.shadowRoot?.textContent?.replace(/\s+/g, ' ') ?? '';
 
-describe('wc-status-line', () => {
+describe('beam-status-line', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -41,7 +41,7 @@ describe('wc-status-line', () => {
   it('names the workspace with its monogram and the folder it lives in', async () => {
     const el = await mount();
     const workspace = el.shadowRoot?.querySelector('.workspace');
-    expect(workspace?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
+    expect(workspace?.querySelector('beam-monogram')?.getAttribute('seed')).toBe('acme');
     expect(workspace?.textContent).toContain('Acme Consulting LLC');
     expect(el.shadowRoot?.querySelector('.path')?.textContent).toBe(
       '~/work/acme-consulting',
@@ -51,20 +51,20 @@ describe('wc-status-line', () => {
   it('leaves the path as selectable text rather than a control', async () => {
     const el = await mount();
     expect(el.shadowRoot?.querySelector('.path')?.tagName).toBe('SPAN');
-    expect(styleText(WcStatusLine)).toMatch(/\.text\s*{[^}]*user-select:\s*text/);
+    expect(styleText(BeamStatusLine)).toMatch(/\.text\s*{[^}]*user-select:\s*text/);
   });
 
   it('says encrypted with a closed lock', async () => {
     const el = await mount({ encrypted: true });
     expect(text(el)).toContain('encrypted');
     expect(text(el)).not.toContain('not encrypted');
-    expect(el.shadowRoot?.querySelector('wc-icon-lock')).not.toBeNull();
+    expect(el.shadowRoot?.querySelector('demo-icon-lock')).not.toBeNull();
   });
 
   it('says not encrypted with an open lock', async () => {
     const el = await mount({ encrypted: false });
     expect(text(el)).toContain('not encrypted');
-    expect(el.shadowRoot?.querySelector('wc-icon-lock-open')).not.toBeNull();
+    expect(el.shadowRoot?.querySelector('demo-icon-lock-open')).not.toBeNull();
   });
 
   it('asks for the palette at the switch scope from the name', async () => {
@@ -90,21 +90,21 @@ describe('wc-status-line', () => {
     expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'all' });
   });
 
-  it('shows the review count and goes to Review when pressed', async () => {
-    const el = await mount({ reviewCount: 84 });
-    const button = el.shadowRoot?.querySelector<HTMLButtonElement>('.review');
-    expect(button?.textContent?.replace(/\s+/g, ' ').trim()).toBe('84 to review');
+  it('shows the waiting count and goes to Inbox when pressed', async () => {
+    const el = await mount({ waitingCount: 84 });
+    const button = el.shadowRoot?.querySelector<HTMLButtonElement>('.inbox');
+    expect(button?.textContent?.replace(/\s+/g, ' ').trim()).toBe('84 waiting');
     const spy = vi.fn();
     el.addEventListener('beam-navigate', spy);
     button?.click();
-    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'review' });
+    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'inbox' });
     expect(spy.mock.calls[0][0].composed).toBe(true);
   });
 
-  it.each([0, undefined])('draws no review segment for %s', async (count) => {
-    const el = await mount({ reviewCount: count });
+  it.each([0, undefined])('draws no waiting segment for %s', async (count) => {
+    const el = await mount({ waitingCount: count });
     expect(el.shadowRoot?.querySelector('.spacer')).not.toBeNull();
-    expect(el.shadowRoot?.querySelector('.review')).toBeNull();
+    expect(el.shadowRoot?.querySelector('.inbox')).toBeNull();
   });
 
   it('shows the version', async () => {
@@ -145,13 +145,13 @@ describe('wc-status-line', () => {
   });
 
   it('insets the focus ring so the panel does not clip it', () => {
-    expect(styleText(WcStatusLine)).toMatch(
+    expect(styleText(BeamStatusLine)).toMatch(
       /button\.segment:focus-visible\s*{[^}]*outline-offset:\s*-2px/,
     );
   });
 
   it('drops the version, then the palette hint, as the line narrows', () => {
-    const css = styleText(WcStatusLine);
+    const css = styleText(BeamStatusLine);
     const version = css.indexOf('@container (max-width: 760px)');
     const hint = css.indexOf('@container (max-width: 620px)');
     expect(css).toMatch(/@container \(max-width: 760px\)\s*{\s*\.drops-first\s*{\s*display:\s*none/);
@@ -161,14 +161,14 @@ describe('wc-status-line', () => {
   });
 
   it('lets the lock label and the workspace name shrink with an ellipsis', async () => {
-    const css = styleText(WcStatusLine);
+    const css = styleText(BeamStatusLine);
     expect(css).toMatch(/\.status \.label\s*{[^}]*text-overflow:\s*ellipsis/);
     expect(css).toMatch(/\.workspace-name\s*{[^}]*text-overflow:\s*ellipsis/);
   });
 
   it('shows only the lock icon when narrow, keeping the label for assistive tech and the tooltip', async () => {
     const el = await mount({ encrypted: true });
-    expect(styleText(WcStatusLine)).toMatch(
+    expect(styleText(BeamStatusLine)).toMatch(
       /@container \(max-width: 560px\)\s*{\s*\.status \.label\s*{[^}]*clip-path:\s*inset\(50%\)/,
     );
     expect(el.shadowRoot?.querySelector('.lock .label')?.textContent).toBe('encrypted');
@@ -189,19 +189,19 @@ describe('wc-status-line', () => {
   });
 
   it('stands down below the mobile breakpoint', () => {
-    expect(styleText(WcStatusLine)).toMatch(
+    expect(styleText(BeamStatusLine)).toMatch(
       /@media \(max-width: 48rem\)\s*{\s*:host\s*{\s*display:\s*none/,
     );
   });
 });
 
-describe('wc-status-line, as any app uses it', () => {
+describe('beam-status-line, as any app uses it', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  async function line(segments: WcStatusLine['segments']): Promise<WcStatusLine> {
-    const el = document.createElement('wc-status-line');
+  async function line(segments: BeamStatusLine['segments']): Promise<BeamStatusLine> {
+    const el = document.createElement('beam-status-line');
     el.workspaceName = 'Example board';
     el.segments = segments;
     document.body.appendChild(el);
@@ -245,10 +245,10 @@ describe('wc-status-line, as any app uses it', () => {
 
   it('sizes an icon when asked and leaves it alone otherwise', async () => {
     const el = await line([
-      { id: 'a', kind: 'status', icon: 'wc-icon-lock', iconSize: 12, label: 'locked' },
-      { id: 'b', kind: 'status', icon: 'wc-icon-lock', label: 'locked' },
+      { id: 'a', kind: 'status', icon: 'demo-icon-lock', iconSize: 12, label: 'locked' },
+      { id: 'b', kind: 'status', icon: 'demo-icon-lock', label: 'locked' },
     ]);
-    const icons = el.shadowRoot!.querySelectorAll<HTMLElement>('wc-icon-lock');
+    const icons = el.shadowRoot!.querySelectorAll<HTMLElement>('demo-icon-lock');
     expect(icons[0].style.getPropertyValue('--beam-icon-size')).toBe('12px');
     expect(icons[1].style.getPropertyValue('--beam-icon-size')).toBe('');
   });
@@ -261,4 +261,4 @@ describe('wc-status-line, as any app uses it', () => {
 
 describePreviewA11y(preview);
 
-describePrintHiding(WcStatusLine, ':host');
+describePrintHiding(BeamStatusLine, ':host');

@@ -1,11 +1,12 @@
-import type { StatusSegment } from '../wc-status-line.js';
+import type { StatusSegment } from '../beam-status-line.js';
+import './icons.js';
 
 /** What an example app says on its status line: the example the tests and previews use. */
 export interface DemoStatus {
   path?: string;
   fullPath?: string;
   encrypted?: boolean;
-  reviewCount?: number;
+  waitingCount?: number;
   version?: string;
   /** `store` omits the version. */
   distribution?: string;
@@ -13,9 +14,9 @@ export interface DemoStatus {
   keyShortcuts?: string;
 }
 
-/** The folder, the lock, what waits in review, the palette hint and the version. */
+/** The folder, the lock, what is waiting, the palette hint and the version. */
 export function demoSegments(status: DemoStatus = {}): StatusSegment[] {
-  const { path = '', fullPath = '', encrypted = false, reviewCount, version = '', distribution = '' } = status;
+  const { path = '', fullPath = '', encrypted = false, waitingCount, version = '', distribution = '' } = status;
   const segments: StatusSegment[] = [];
   if (path) {
     segments.push({ id: 'path', kind: 'text', label: path, title: fullPath || path });
@@ -23,20 +24,20 @@ export function demoSegments(status: DemoStatus = {}): StatusSegment[] {
   segments.push({
     id: 'lock',
     kind: 'status',
-    icon: encrypted ? 'wc-icon-lock' : 'wc-icon-lock-open',
+    icon: encrypted ? 'demo-icon-lock' : 'demo-icon-lock-open',
     iconSize: 12,
     label: encrypted ? 'encrypted' : 'not encrypted',
     title: encrypted ? 'Encrypted' : 'Not encrypted',
   });
-  if (reviewCount && reviewCount > 0) {
+  if (waitingCount && waitingCount > 0) {
     segments.push({
-      id: 'review',
+      id: 'inbox',
       side: 'end',
       tone: 'warning',
-      icon: 'wc-icon-status-overdue',
+      icon: 'demo-icon-warning',
       iconSize: 9,
-      label: `${reviewCount} to review`,
-      navigate: 'review',
+      label: `${waitingCount} waiting`,
+      navigate: 'inbox',
     });
   }
   segments.push({

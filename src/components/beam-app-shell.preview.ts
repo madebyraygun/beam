@@ -1,9 +1,9 @@
 import { html } from 'lit';
-import './wc-app-shell.js';
-import './wc-nav-sidebar.js';
+import './beam-app-shell.js';
+import './beam-nav-sidebar.js';
 import { NAV_ITEMS } from './__mocks__/nav.js';
 import { demoSegments } from './__mocks__/status.js';
-import type { BreadcrumbItem } from './wc-breadcrumb.js';
+import type { BreadcrumbItem } from './beam-breadcrumb.js';
 import type { Preview } from '../../preview/types.js';
 
 interface ShellAttrs {
@@ -26,7 +26,7 @@ const shell = (extra = html``, attrs: ShellAttrs = {}) => {
     <div
       style="width:${width};height:720px;border:1px solid var(--beam-color-border);overflow:hidden;"
     >
-      <wc-app-shell
+      <beam-app-shell
         screen-title=${title}
         ?title-hidden=${attrs.titleHidden ?? false}
         workspace-name=${attrs.workspace ?? 'Acme Consulting LLC'}
@@ -40,29 +40,29 @@ const shell = (extra = html``, attrs: ShellAttrs = {}) => {
               path: '~/work/acme-consulting',
               encrypted: true,
               version: '1.0',
-              reviewCount: 84,
+              waitingCount: 84,
             })}
         .narrowQuery=${attrs.narrow ? { matches: true } : undefined}
         style="height:100%;"
       >
         ${attrs.hosted
           ? html``
-          : html`<wc-nav-sidebar
+          : html`<beam-nav-sidebar
               slot="sidebar"
               product-name="example"
               ?collapsed=${attrs.collapsed ?? false}
               .items=${NAV_ITEMS}
               active=${attrs.active ?? 'dashboard'}
-            ></wc-nav-sidebar>`}
+            ></beam-nav-sidebar>`}
         ${extra}
         <p style="color:var(--beam-color-muted);">Screen content goes here.</p>
-      </wc-app-shell>
+      </beam-app-shell>
     </div>
   `;
 };
 
 const preview: Preview = {
-  id: 'wc-app-shell',
+  id: 'beam-app-shell',
   title: 'App Shell',
   group: 'Layout',
   description:
@@ -72,12 +72,12 @@ const preview: Preview = {
     { name: 'default', render: () => shell() },
     { name: 'sidebar-collapsed', render: () => shell(html``, { collapsed: true }) },
     {
-      name: 'invoice-detail',
+      name: 'item-detail',
       render: () =>
         shell(html``, {
-          title: 'Invoices',
-          active: 'invoices',
-          trail: [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }],
+          title: 'Orders',
+          active: 'orders',
+          trail: [{ label: 'Orders', id: 'orders' }, { label: '#1254' }],
         }),
     },
     {
@@ -88,7 +88,7 @@ const preview: Preview = {
     {
       name: 'title-hidden',
       render: () =>
-        shell(html``, { title: 'Register', active: 'register', titleHidden: true }),
+        shell(html``, { title: 'Items', active: 'items', titleHidden: true }),
     },
     {
       name: 'long workspace name',

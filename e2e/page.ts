@@ -5,31 +5,31 @@ import '../src/index.js';
 import { dispatchToast } from '../src/index.js';
 
 const items = [
-  { id: 'board', label: 'Board', icon: 'wc-icon-dashboard' },
-  { id: 'list', label: 'List', icon: 'wc-icon-register' },
+  { id: 'board', label: 'Board', icon: 'beam-icon-dashboard' },
+  { id: 'list', label: 'List', icon: 'beam-icon-flag' },
 ];
 
 render(
   html`
-    <wc-app-shell
+    <beam-app-shell
       workspace-name="Example board"
       workspace-key="example"
       screen-title="Board"
       .trail=${[{ label: 'Board' }]}
       .statusSegments=${[{ id: 'count', label: '12 records' }]}
     >
-      <wc-nav-sidebar slot="sidebar" product-name="example" .items=${items} active="board"></wc-nav-sidebar>
+      <beam-nav-sidebar slot="sidebar" product-name="example" .items=${items} active="board"></beam-nav-sidebar>
       <div>
-        <wc-monogram name="Example board" seed="example" size="l"></wc-monogram>
-        <wc-icon-search id="icon"></wc-icon-search>
+        <beam-monogram name="Example board" seed="example" size="l"></beam-monogram>
+        <beam-icon-search id="icon"></beam-icon-search>
       </div>
-    </wc-app-shell>
+    </beam-app-shell>
   `,
   document.body,
 );
 
-await customElements.whenDefined('wc-app-shell');
-await (document.querySelector('wc-app-shell') as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete;
+await customElements.whenDefined('beam-app-shell');
+await (document.querySelector('beam-app-shell') as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete;
 dispatchToast(window, { message: 'Saved.', duration: 0 });
 await new Promise((resolve) => requestAnimationFrame(resolve));
 (window as unknown as { ready: boolean }).ready = true;

@@ -2,7 +2,7 @@ import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { baseCss } from "../theme/index.js";
 import { NAVIGATE_EVENT, PALETTE_OPEN_EVENT, emit } from "../events.js";
-import "./wc-monogram.js";
+import "./beam-monogram.js";
 import "../icons/icons.js";
 
 /** One level of the trail after the workspace name. */
@@ -46,8 +46,8 @@ export function dispatchPaletteOpen(
  * (`beam-palette-open`); an earlier level is a button that navigates back to
  * its screen (`beam-navigate`), the same event the sidebar sends.
  */
-@customElement("wc-breadcrumb")
-export class WcBreadcrumb extends LitElement {
+@customElement("beam-breadcrumb")
+export class BeamBreadcrumb extends LitElement {
   static styles = [
     baseCss,
     css`
@@ -109,7 +109,7 @@ export class WcBreadcrumb extends LitElement {
         white-space: nowrap;
       }
 
-      .workspace wc-icon-chevron-down {
+      .workspace beam-icon-chevron-down {
         --beam-icon-size: 14px;
         color: var(--beam-color-muted);
       }
@@ -181,12 +181,12 @@ export class WcBreadcrumb extends LitElement {
               title=${this.switchLabel}
               @click=${(event: Event) => dispatchPaletteOpen(event.currentTarget as HTMLElement, this.switchScope)}
             >
-              <wc-monogram
+              <beam-monogram
                 name=${this.workspaceName}
                 seed=${this.workspaceKey}
-              ></wc-monogram>
+              ></beam-monogram>
               <span class="workspace-name">${this.workspaceName}</span>
-              <wc-icon-chevron-down></wc-icon-chevron-down>
+              <beam-icon-chevron-down></beam-icon-chevron-down>
             </button>
           </li>
           ${this.trail.map((item, index) => {
@@ -223,7 +223,7 @@ export class WcBreadcrumb extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wc-breadcrumb": WcBreadcrumb;
+    "beam-breadcrumb": BeamBreadcrumb;
   }
   interface HTMLElementEventMap {
     [PALETTE_OPEN_EVENT]: CustomEvent<PaletteOpenDetail>;

@@ -1,19 +1,19 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import './wc-breadcrumb.js';
-import { WcBreadcrumb } from './wc-breadcrumb.js';
+import './beam-breadcrumb.js';
+import { BeamBreadcrumb } from './beam-breadcrumb.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
-import preview from './wc-breadcrumb.preview.js';
+import preview from './beam-breadcrumb.preview.js';
 
-async function mount(props: Partial<WcBreadcrumb> = {}): Promise<WcBreadcrumb> {
-  const el = document.createElement('wc-breadcrumb');
+async function mount(props: Partial<BeamBreadcrumb> = {}): Promise<BeamBreadcrumb> {
+  const el = document.createElement('beam-breadcrumb');
   Object.assign(el, { workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme' }, props);
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
 }
 
-describe('wc-breadcrumb', () => {
+describe('beam-breadcrumb', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -26,8 +26,8 @@ describe('wc-breadcrumb', () => {
   it('leads with the workspace: its monogram and its name', async () => {
     const el = await mount({ trail: [{ label: 'Dashboard' }] });
     const workspace = el.shadowRoot?.querySelector('.workspace');
-    expect(workspace?.querySelector('wc-monogram')?.getAttribute('name')).toBe('Acme Consulting LLC');
-    expect(workspace?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
+    expect(workspace?.querySelector('beam-monogram')?.getAttribute('name')).toBe('Acme Consulting LLC');
+    expect(workspace?.querySelector('beam-monogram')?.getAttribute('seed')).toBe('acme');
     expect(workspace?.querySelector('.workspace-name')?.textContent).toBe('Acme Consulting LLC');
   });
 
@@ -50,18 +50,18 @@ describe('wc-breadcrumb', () => {
 
   it('turns an earlier level into a way back to its screen', async () => {
     const el = await mount({
-      trail: [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }],
+      trail: [{ label: 'Orders', id: 'orders' }, { label: '#1254' }],
     });
     const spy = vi.fn();
     el.addEventListener('beam-navigate', spy);
-    el.shadowRoot?.querySelector<HTMLButtonElement>('[data-level="invoices"]')?.click();
-    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'invoices' });
+    el.shadowRoot?.querySelector<HTMLButtonElement>('[data-level="orders"]')?.click();
+    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'orders' });
     expect(spy.mock.calls[0][0].composed).toBe(true);
   });
 
   it('separates the levels with a slash nobody hears', async () => {
     const el = await mount({
-      trail: [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }],
+      trail: [{ label: 'Orders', id: 'orders' }, { label: '#1254' }],
     });
     const seps = [...(el.shadowRoot?.querySelectorAll('.sep') ?? [])];
     expect(seps).toHaveLength(2);
@@ -73,7 +73,7 @@ describe('wc-breadcrumb', () => {
 
   it('sets the last level of a deeper trail in text colour', async () => {
     const el = await mount({
-      trail: [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }],
+      trail: [{ label: 'Orders', id: 'orders' }, { label: '#1254' }],
     });
     expect(el.shadowRoot?.querySelector('[aria-current="page"]')?.classList).toContain('deep');
   });
@@ -81,4 +81,4 @@ describe('wc-breadcrumb', () => {
 
 describePreviewA11y(preview);
 
-describePrintHiding(WcBreadcrumb, ':host');
+describePrintHiding(BeamBreadcrumb, ':host');

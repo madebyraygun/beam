@@ -26,7 +26,7 @@ const COLOUR_FUNCTION = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/;
 
 /**
  * Hex literals of the lengths CSS accepts. A run of digits only is also how
- * an invoice number reads in prose ("Invoice #1251"), so the four-digit form
+ * an order number reads in prose ("Order #1251"), so the four-digit form
  * — which collides with those — counts only when it contains a hex letter.
  */
 const HEX = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b|#(?=[0-9]*[a-fA-F])[0-9a-fA-F]{4}\b/;
@@ -78,8 +78,8 @@ describe('the colour matcher', () => {
   });
 
   it.each([
-    "'<h1>Invoice #1251</h1><p>Acme Co — $1,850.00</p>'",
-    'Invoice #1248 is overdue',
+    "'<h1>Order #1251</h1><p>Acme Co — $1,850.00</p>'",
+    'Order #1248 is late',
     'white-space: nowrap;',
     'background: color-mix(in srgb, var(--beam-color-danger) 10%, var(--beam-color-surface));',
     'const c = gradientColor(t);',

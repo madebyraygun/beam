@@ -1,19 +1,19 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import './wc-search-pill.js';
-import { WcSearchPill } from './wc-search-pill.js';
+import './beam-search-pill.js';
+import { BeamSearchPill } from './beam-search-pill.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
-import preview from './wc-search-pill.preview.js';
+import preview from './beam-search-pill.preview.js';
 
-async function mount(props: Partial<WcSearchPill> = {}): Promise<WcSearchPill> {
-  const el = document.createElement('wc-search-pill');
+async function mount(props: Partial<BeamSearchPill> = {}): Promise<BeamSearchPill> {
+  const el = document.createElement('beam-search-pill');
   Object.assign(el, props);
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
 }
 
-describe('wc-search-pill', () => {
+describe('beam-search-pill', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -44,4 +44,4 @@ describe('wc-search-pill', () => {
 
 describePreviewA11y(preview);
 
-describePrintHiding(WcSearchPill, ':host');
+describePrintHiding(BeamSearchPill, ':host');

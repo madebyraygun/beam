@@ -60,7 +60,7 @@ axe.configure({
 }
 
 // jsdom's HTMLDialogElement has no showModal()/show()/close(). A dialog component
-// calls showModal() internally, so wc-confirm is untestable without these.
+// calls showModal() internally, so a dialog component is untestable without these.
 if (typeof window !== 'undefined' && window.HTMLDialogElement) {
   const dialogProto = window.HTMLDialogElement.prototype;
   if (typeof dialogProto.showModal !== 'function') {

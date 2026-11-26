@@ -17,7 +17,7 @@ import { property } from 'lit/decorators.js';
  * `--beam-icon-fill` fills the shape as well as stroking it; it inherits, so a
  * control sets it on itself for the icon inside.
  */
-export abstract class WcIconBase extends LitElement {
+export abstract class BeamIconBase extends LitElement {
   static styles = css`
     :host {
       display: inline-flex;
@@ -35,7 +35,7 @@ export abstract class WcIconBase extends LitElement {
     }
 
     /* Outline by default; --beam-icon-fill paints the shape solid, which is
-       how a pressed toggle such as the register's flag reads as on. */
+       how a pressed toggle such as a flag reads as on. */
     svg {
       width: 100%;
       height: 100%;

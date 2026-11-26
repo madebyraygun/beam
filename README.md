@@ -20,14 +20,14 @@ one line in each app.
 | `beam/default-theme.css` | The default theme: every token, light and dark. Load it in the page, or load your own theme instead. |
 | `beam/theme` | `TOKENS` (the contract as data), `defaultTheme` (the same theme as a Lit style), `baseCss`, and the light and dark mode functions. |
 | `beam/events` | The event names (`NAVIGATE_EVENT` and the rest) and `EVENT_PREFIX`. |
-| `beam/components/<name>.js` | One component, registered on import: `wc-app-shell`, `wc-nav-sidebar`, `wc-breadcrumb`, `wc-status-line`, `wc-search-pill`, `wc-monogram`, `wc-toast`. |
-| `beam/icons` | The `wc-icon-*` elements. |
+| `beam/components/<name>.js` | One component, registered on import: `beam-app-shell`, `beam-nav-sidebar`, `beam-breadcrumb`, `beam-status-line`, `beam-search-pill`, `beam-monogram`, `beam-toast`. |
+| `beam/icons` | `BeamIconBase` and the six `beam-icon-*` elements the shell draws and both apps use: dashboard, flag, menu, refresh, chevron-down, search. |
 | `beam` | All of the above. Importing it registers every component. |
 
 ## Using it
 
 ```html
-<wc-app-shell
+<beam-app-shell
   workspace-name="Example board"
   workspace-key="example"
   switch-label="Switch boards"
@@ -36,31 +36,31 @@ one line in each app.
   .trail=${[{ label: 'Board' }]}
   .statusSegments=${segments}
 >
-  <wc-nav-sidebar slot="sidebar" product-name="example" .items=${items} active="board">
+  <beam-nav-sidebar slot="sidebar" product-name="example" .items=${items} active="board">
     <svg slot="mark" ...></svg>
-  </wc-nav-sidebar>
+  </beam-nav-sidebar>
   ...the screen...
-</wc-app-shell>
+</beam-app-shell>
 ```
 
 - **Words are the app's.** The first breadcrumb level is "what is open": `workspace-name`
   and `workspace-key` (which picks its monogram colour). Its tooltip is `switch-label`
   (default "Switch workspace") and pressing it asks for the palette at `switch-scope`
-  (default `workspaces`). The search box's word is `label` on `wc-search-pill` (default
+  (default `workspaces`). The search box's word is `label` on `beam-search-pill` (default
   "Search"); the refresh button's is `refresh-label` on the shell (default "Refresh").
-- **The product's name and mark.** `wc-nav-sidebar` draws `product-name` beside its toggle,
+- **The product's name and mark.** `beam-nav-sidebar` draws `product-name` beside its toggle,
   and whatever is in its `mark` slot before it. With neither, it draws only the toggle.
-- **The status line.** `statusSegments` on the shell (or `segments` on `wc-status-line`) is
+- **The status line.** `statusSegments` on the shell (or `segments` on `beam-status-line`) is
   what the line holds after the name: each segment has an `id`, a `label`, and optionally an
   icon, a keycap, a tooltip, a side (`start` or `end`), a tone (`ok`, `warning`, `danger`), a
   kind (`text` to select and copy, `status` for an icon whose label hides when narrow), and
   when it drops out as the line narrows. A segment with `navigate`, `palette` or `action` is a
   button. Leave `statusSegments` undefined for no status line; pass an empty list for the name
-  alone. The full type is `StatusSegment` in `src/components/wc-status-line.ts`.
+  alone. The full type is `StatusSegment` in `src/components/beam-status-line.ts`.
 - **Events.** Every event bubbles out of every shadow root and is named `beam-<what>`:
   `beam-navigate` `{ id }`, `beam-palette-open` `{ scope }`, `beam-status-action` `{ id }`,
   `beam-sidebar-toggle` `{ collapsed }`, `beam-refresh`, and `beam-toast` (send it with
-  `dispatchToast`; `wc-toast`, which the shell holds, listens on `window`). The prefix is
+  `dispatchToast`; `beam-toast`, which the shell holds, listens on `window`). The prefix is
   `EVENT_PREFIX` in `src/events.ts`, the one place it is written; listen with the exported
   names rather than the strings.
 
@@ -92,20 +92,20 @@ There are three routes in, from lightest to heaviest, and one way round.
 1. **Override tokens.** Set any token in the table below on `:root` (both modes) or under the
    dark selectors. Custom properties inherit through shadow roots, so one rule in the page
    reaches every component. To change one instance, set the token on that element:
-   `wc-monogram.big { --beam-monogram-size: 48px; }`.
+   `beam-monogram.big { --beam-monogram-size: 48px; }`.
 2. **Style exposed parts.** Each component names the pieces worth styling with `part`, and a
    rule in the tree that holds the component reaches them with `::part()`:
-   `wc-nav-sidebar::part(item active) { font-weight: 700; }`. The parts:
+   `beam-nav-sidebar::part(item active) { font-weight: 700; }`. The parts:
 
    | Component | Parts |
    | --- | --- |
-   | `wc-app-shell` | `sidebar`, `backdrop`, `header`, `nav-toggle`, `refresh`, `banner`, `content`, `page-head`, `status-line` |
-   | `wc-nav-sidebar` | `head`, `toggle`, `product-name`, `group-label`, `item` (with `active` on the current one), `footer` |
-   | `wc-breadcrumb` | `workspace`, `level` |
-   | `wc-status-line` | `workspace`, `segment` |
-   | `wc-search-pill` | `button`, `keycap` |
-   | `wc-monogram` | `tile` |
-   | `wc-toast` | `toast`, `action`, `close` |
+   | `beam-app-shell` | `sidebar`, `backdrop`, `header`, `nav-toggle`, `refresh`, `banner`, `content`, `page-head`, `status-line` |
+   | `beam-nav-sidebar` | `head`, `toggle`, `product-name`, `group-label`, `item` (with `active` on the current one), `footer` |
+   | `beam-breadcrumb` | `workspace`, `level` |
+   | `beam-status-line` | `workspace`, `segment` |
+   | `beam-search-pill` | `button`, `keycap` |
+   | `beam-monogram` | `tile` |
+   | `beam-toast` | `toast`, `action`, `close` |
 
    A part rule is written in the tree that holds the component, and reaches one shadow root
    down: a rule in the document styles a shell that sits in the document, and a rule in your
@@ -114,19 +114,24 @@ There are three routes in, from lightest to heaviest, and one way round.
 
    | Component | Slots |
    | --- | --- |
-   | `wc-app-shell` | `sidebar`, `banner`, `page-actions`, and the default slot for the screen |
-   | `wc-nav-sidebar` | `mark`, before the product name |
-   | `wc-status-line` | `start` and `end`, beside the segments on each side of the spacer |
+   | `beam-app-shell` | `sidebar`, `banner`, `page-actions`, and the default slot for the screen |
+   | `beam-nav-sidebar` | `mark`, before the product name |
+   | `beam-status-line` | `start` and `end`, beside the segments on each side of the spacer |
 
 **Wrapping one in your own.** When a component needs behaviour or markup none of the routes
 give, write your own element that renders it and adds what is missing, and use yours in the
 app. Pass properties through and re-send or listen for its events; style it from your
 element's styles with tokens and parts as above. Subclassing works too (`class MyShell
-extends WcAppShell`, registered under your own tag, with `static styles = [WcAppShell.styles,
+extends BeamAppShell`, registered under your own tag, with `static styles = [BeamAppShell.styles,
 css\`…\`]`), but a subclass depends on internals beam may change; a wrapper depends only on
 what is documented here.
 
-**What goes into beam.** A component moves into the package only once both apps use it.
+**Icons.** An app draws its own icons on `BeamIconBase` (from `beam/icons`) under its own
+tag names: a subclass supplies only its paths on a 24×24 grid, and sizing, stroke,
+`inline` and the label come with the base. A nav item's or status segment's `icon` is any
+registered tag name. `src/components/__mocks__/icons.ts` is a worked example.
+
+**What goes into beam.** A component or an icon moves into the package only once both apps use it.
 Until then it lives in the app that has it, built on the same tokens so that it can move
 later without change. A component that moves in leaves behind every word, colour, font and
 value that belongs to one app: those become tokens, properties or slots with neutral
@@ -239,7 +244,7 @@ An app that uses the package from a folder beside it (`"beam": "file:../beam"`) 
 
 ## Licence
 
-Not chosen yet.
+MIT; see `LICENSE`.
 
 ## For CI
 

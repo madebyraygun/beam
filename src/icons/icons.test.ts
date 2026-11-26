@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { render } from 'lit';
 import './icons.js';
 import { ICON_TAGS } from './icons.js';
-import { WcIconBase } from './icon-base.js';
+import { BeamIconBase } from './icon-base.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import preview from './icons.preview.js';
 
@@ -21,7 +21,7 @@ function marksIn(name: string): Element[] {
   document.body.appendChild(host);
   render(state.render(), host);
   const marks = [...host.querySelectorAll('*')].filter((el) =>
-    tagOf(el).startsWith('wc-icon-'),
+    tagOf(el).startsWith('beam-icon-'),
   );
   host.remove();
   return marks;
@@ -53,7 +53,7 @@ describe('icons', () => {
   });
 
   it('is hidden from assistive tech when unlabelled', async () => {
-    const el = await mount('wc-icon-flag');
+    const el = await mount('beam-icon-flag');
     const svg = el.shadowRoot?.querySelector('svg');
     expect(svg?.getAttribute('role')).toBe('presentation');
     expect(svg?.getAttribute('aria-hidden')).toBe('true');
@@ -61,7 +61,7 @@ describe('icons', () => {
   });
 
   it('becomes an img with an accessible name when labelled', async () => {
-    const el = await mount('wc-icon-flag', 'Flagged');
+    const el = await mount('beam-icon-flag', 'Flagged');
     const svg = el.shadowRoot?.querySelector('svg');
     expect(svg?.getAttribute('role')).toBe('img');
     expect(svg?.getAttribute('aria-hidden')).toBe('false');
@@ -76,7 +76,7 @@ describe('icons', () => {
  */
 describe('inline sizing', () => {
   it('is a mode of its own, leaving the token to size everything else', () => {
-    const css = sheet(WcIconBase);
+    const css = sheet(BeamIconBase);
     expect(css).toContain('width: var(--beam-icon-size)');
     expect(css).toContain('height: var(--beam-icon-size)');
     // A separate rule behind the attribute, so nothing gets 1em by default.
@@ -84,7 +84,7 @@ describe('inline sizing', () => {
   });
 
   it('is off unless it is asked for', async () => {
-    const el = await mount('wc-icon-flag');
+    const el = await mount('beam-icon-flag');
     expect(el.hasAttribute('inline')).toBe(false);
     expect((el as HTMLElement & { inline: boolean }).inline).toBe(false);
     el.remove();
@@ -110,34 +110,6 @@ describe('inline sizing', () => {
         `${name} stands in for text characters and must be inline`,
       ).toEqual([]);
     }
-  });
-});
-
-/**
- * The glyphs the app-refresh handoff asks for (`docs/design/app-refresh`,
- * "Assets"). Its `x` is `wc-icon-close`.
- */
-describe('the handoff icons', () => {
-  const HANDOFF = [
-    'wc-icon-lock',
-    'wc-icon-lock-open',
-    'wc-icon-search',
-    'wc-icon-chevron-down',
-    'wc-icon-chevron-up-down',
-    'wc-icon-flag',
-    'wc-icon-plus',
-    'wc-icon-folder',
-    'wc-icon-monitor',
-    'wc-icon-keyboard',
-    'wc-icon-close',
-  ] as const;
-
-  it.each(HANDOFF)('%s is in the set', (tag) => {
-    expect(ICON_TAGS).toContain(tag);
-  });
-
-  it.each(HANDOFF)('%s is drawn in the preview gallery', (tag) => {
-    expect(marksIn('default').map(tagOf)).toContain(tag);
   });
 });
 

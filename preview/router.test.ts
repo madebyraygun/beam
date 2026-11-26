@@ -4,8 +4,8 @@ import { parseRoute, routeToUrl } from './router.js';
 describe('parseRoute', () => {
   it('reads preview, state and mode', () => {
     expect(
-      parseRoute('http://localhost:9090/?preview=wc-money&state=negative&mode=preview'),
-    ).toEqual({ previewId: 'wc-money', stateName: 'negative', mode: 'preview' });
+      parseRoute('http://localhost:9090/?preview=demo-widget&state=negative&mode=preview'),
+    ).toEqual({ previewId: 'demo-widget', stateName: 'negative', mode: 'preview' });
   });
 
   it('omits absent parameters', () => {
@@ -19,8 +19,8 @@ describe('parseRoute', () => {
 
 describe('routeToUrl', () => {
   it('serialises a full route', () => {
-    expect(routeToUrl({ previewId: 'wc-money', stateName: 'negative', mode: 'preview' })).toBe(
-      '?preview=wc-money&state=negative&mode=preview',
+    expect(routeToUrl({ previewId: 'demo-widget', stateName: 'negative', mode: 'preview' })).toBe(
+      '?preview=demo-widget&state=negative&mode=preview',
     );
   });
 
@@ -29,7 +29,7 @@ describe('routeToUrl', () => {
   });
 
   it('round-trips', () => {
-    const route = { previewId: 'wc-toast', stateName: 'danger' };
+    const route = { previewId: 'beam-toast', stateName: 'danger' };
     expect(parseRoute(`http://localhost:9090/${routeToUrl(route)}`)).toEqual(route);
   });
 });

@@ -1,10 +1,10 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { MONOGRAM_TONES } from '../theme/index.js';
-import './wc-monogram.js';
-import { WcMonogram, monogramInitials, monogramTone } from './wc-monogram.js';
+import './beam-monogram.js';
+import { BeamMonogram, monogramInitials, monogramTone } from './beam-monogram.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { styleText } from '../../preview/style-text.js';
-import preview from './wc-monogram.preview.js';
+import preview from './beam-monogram.preview.js';
 
 describe('monogramInitials', () => {
   it.each([
@@ -44,13 +44,13 @@ describe('monogramTone', () => {
   });
 });
 
-describe('wc-monogram', () => {
+describe('beam-monogram', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  async function mount(props: Partial<WcMonogram>): Promise<WcMonogram> {
-    const el = document.createElement('wc-monogram');
+  async function mount(props: Partial<BeamMonogram>): Promise<BeamMonogram> {
+    const el = document.createElement('beam-monogram');
     Object.assign(el, props);
     document.body.appendChild(el);
     await el.updateComplete;
@@ -72,7 +72,7 @@ describe('wc-monogram', () => {
   });
 
   it('draws its text in the on-gradient ink on every pastel', () => {
-    const text = styleText(WcMonogram);
+    const text = styleText(BeamMonogram);
     expect(text).toMatch(/\.tile\s*{[^}]*color:\s*var\(--beam-color-on-tone\)/);
     for (let tone = 2; tone <= MONOGRAM_TONES; tone += 1) {
       expect(text).toContain(`.tone-${tone}`);

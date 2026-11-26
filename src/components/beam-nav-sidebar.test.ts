@@ -1,25 +1,25 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import './wc-nav-sidebar.js';
-import { WcNavSidebar } from './wc-nav-sidebar.js';
+import './beam-nav-sidebar.js';
+import { BeamNavSidebar } from './beam-nav-sidebar.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
 import { NAV_ITEMS, NAV_ITEMS_WITH_DISABLED } from './__mocks__/nav.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { styleText } from '../../preview/style-text.js';
-import preview from './wc-nav-sidebar.preview.js';
+import preview from './beam-nav-sidebar.preview.js';
 
-async function mount(props: Partial<WcNavSidebar> = {}): Promise<WcNavSidebar> {
-  const el = document.createElement('wc-nav-sidebar');
+async function mount(props: Partial<BeamNavSidebar> = {}): Promise<BeamNavSidebar> {
+  const el = document.createElement('beam-nav-sidebar');
   Object.assign(el, { items: NAV_ITEMS, active: 'dashboard' }, props);
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
 }
 
-function button(el: WcNavSidebar, id: string): HTMLButtonElement | null {
+function button(el: BeamNavSidebar, id: string): HTMLButtonElement | null {
   return el.shadowRoot?.querySelector(`[data-nav="${id}"]`) ?? null;
 }
 
-describe('wc-nav-sidebar', () => {
+describe('beam-nav-sidebar', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -35,8 +35,8 @@ describe('wc-nav-sidebar', () => {
   });
 
   it('marks the active item as the current page', async () => {
-    const el = await mount({ active: 'register' });
-    expect(button(el, 'register')?.getAttribute('aria-current')).toBe('page');
+    const el = await mount({ active: 'items' });
+    expect(button(el, 'items')?.getAttribute('aria-current')).toBe('page');
     expect(button(el, 'dashboard')?.getAttribute('aria-current')).toBe('false');
   });
 
@@ -45,17 +45,17 @@ describe('wc-nav-sidebar', () => {
     const spy = vi.fn();
     el.addEventListener('beam-navigate', spy);
 
-    button(el, 'register')?.click();
+    button(el, 'items')?.click();
 
     expect(spy).toHaveBeenCalledOnce();
-    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'register' });
+    expect(spy.mock.calls[0][0].detail).toEqual({ id: 'items' });
   });
 
   it('bubbles and composes the event so the app can listen at the shell', async () => {
     const el = await mount();
     const spy = vi.fn();
     document.body.addEventListener('beam-navigate', spy);
-    button(el, 'review')?.click();
+    button(el, 'inbox')?.click();
     expect(spy).toHaveBeenCalledOnce();
     document.body.removeEventListener('beam-navigate', spy);
   });
@@ -65,21 +65,21 @@ describe('wc-nav-sidebar', () => {
     const spy = vi.fn();
     el.addEventListener('beam-navigate', spy);
 
-    button(el, 'register')?.click();
+    button(el, 'items')?.click();
 
     expect(spy).not.toHaveBeenCalled();
   });
 
   it('exposes disabled state to assistive tech', async () => {
     const el = await mount({ items: NAV_ITEMS_WITH_DISABLED });
-    expect(button(el, 'register')?.getAttribute('aria-disabled')).toBe('true');
+    expect(button(el, 'items')?.getAttribute('aria-disabled')).toBe('true');
     expect(button(el, 'dashboard')?.getAttribute('aria-disabled')).toBe('false');
   });
 
   it('keeps the label reachable when collapsed', async () => {
     const el = await mount({ collapsed: true });
     // The text is hidden by CSS, so the title attribute is what is left.
-    expect(button(el, 'register')?.getAttribute('title')).toBe('Register');
+    expect(button(el, 'items')?.getAttribute('title')).toBe('Items');
   });
 
   it('reflects collapsed so CSS can key off it', async () => {
@@ -89,7 +89,7 @@ describe('wc-nav-sidebar', () => {
 
   it('renders the icon element named by an item', async () => {
     const el = await mount();
-    expect(button(el, 'register')?.querySelector('wc-icon-register')).toBeTruthy();
+    expect(button(el, 'items')?.querySelector('demo-icon-items')).toBeTruthy();
   });
 
   it('renders items without icons', async () => {
@@ -100,9 +100,9 @@ describe('wc-nav-sidebar', () => {
 
 describePreviewA11y(preview);
 
-describePrintHiding(WcNavSidebar, ':host');
+describePrintHiding(BeamNavSidebar, ':host');
 
-describe('wc-nav-sidebar groups', () => {
+describe('beam-nav-sidebar groups', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -112,19 +112,19 @@ describe('wc-nav-sidebar groups', () => {
     const labels = [...(el.shadowRoot?.querySelectorAll('.group-label') ?? [])].map(
       (node) => node.textContent,
     );
-    expect(labels).toEqual(['Statements', 'Billing', 'Setup']);
+    expect(labels).toEqual(['Data', 'Work', 'Setup']);
     const first = el.shadowRoot?.querySelector('.group ul');
     expect([...(first?.querySelectorAll('[data-nav]') ?? [])].map((b) => b.getAttribute('data-nav'))).toEqual(
-      ['dashboard', 'register', 'review', 'reports'],
+      ['dashboard', 'items', 'inbox', 'activity'],
     );
   });
 
   it('names each labelled list by its label', async () => {
     const el = await mount();
-    const list = button(el, 'invoices')?.closest('ul');
+    const list = button(el, 'orders')?.closest('ul');
     const id = list?.getAttribute('aria-labelledby');
     expect(id).toBeTruthy();
-    expect(el.shadowRoot?.getElementById(id ?? '')?.textContent).toBe('Billing');
+    expect(el.shadowRoot?.getElementById(id ?? '')?.textContent).toBe('Work');
   });
 
   it('pins Settings in the footer, below every group', async () => {
@@ -138,27 +138,27 @@ describe('wc-nav-sidebar groups', () => {
     expect(el.shadowRoot?.querySelector('nav .footer')).toBeTruthy();
   });
 
-  it('shows the review count', async () => {
+  it('shows the waiting count', async () => {
     const el = await mount();
-    expect(button(el, 'review')?.querySelector('.count')?.textContent).toBe('84');
+    expect(button(el, 'inbox')?.querySelector('.count')?.textContent).toBe('84');
   });
 
   it('shows no count at zero', async () => {
     const el = await mount({
-      items: NAV_ITEMS.map((item) => (item.id === 'review' ? { ...item, count: 0 } : item)),
+      items: NAV_ITEMS.map((item) => (item.id === 'inbox' ? { ...item, count: 0 } : item)),
     });
-    expect(button(el, 'review')?.querySelector('.count')).toBeNull();
+    expect(button(el, 'inbox')?.querySelector('.count')).toBeNull();
   });
 
   it('draws the active item with the rainbow hairline', () => {
-    const text = styleText(WcNavSidebar);
+    const text = styleText(BeamNavSidebar);
     expect(text).toMatch(
       /\.item\.active\s*{[^}]*padding-box,\s*var\(--beam-accent-image\) border-box/,
     );
   });
 });
 
-describe('wc-nav-sidebar header', () => {
+describe('beam-nav-sidebar header', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -219,7 +219,7 @@ describe('wc-nav-sidebar header', () => {
   });
 
   it('folds over 180ms and stops for anyone who asked motion to stop', () => {
-    const text = styleText(WcNavSidebar);
+    const text = styleText(BeamNavSidebar);
     expect(text).toMatch(/:host\s*{[^}]*transition:\s*width var\(--beam-transition-sidebar\)/);
     expect(text).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*:host\s*{[^}]*transition:\s*none/,
@@ -227,10 +227,9 @@ describe('wc-nav-sidebar header', () => {
   });
 });
 
-describe('wc-nav-sidebar on a phone', () => {
-  // jsdom has no layout engine, so the rules are read the way the register's
-  // fill rules are.
-  const text = styleText(WcNavSidebar);
+describe('beam-nav-sidebar on a phone', () => {
+  // jsdom has no layout engine, so the rules are read from the stylesheet text.
+  const text = styleText(BeamNavSidebar);
 
   it('keeps its labels when it is the drawer rather than the rail', () => {
     // Collapsed means "off-canvas" at this width, not "56px of icons": the

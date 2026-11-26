@@ -80,8 +80,8 @@ declare global {
  * from inside a modal dialog's top layer or from any component that is not nested
  * under the app shell. Anchoring the listener to a host element loses those.
  */
-@customElement('wc-toast')
-export class WcToast extends LitElement {
+@customElement('beam-toast')
+export class BeamToast extends LitElement {
   static styles = css`
     :host {
       /* The region is fixed-position; the host itself takes no space. */
@@ -221,9 +221,9 @@ export class WcToast extends LitElement {
       }
     }
 
-    /* Screen chrome, not part of the report. This lives here rather than in
+    /* Screen chrome, not part of the printed page. This lives here rather than in
        the theme's print sheet because a rule that hides an element has to
-       be in the tree that element is in, and every wc-* here sits inside
+       be in the tree that element is in, and every component here may sit inside
        the app's shadow root where a document rule cannot reach it. */
     @media print {
       :host {
@@ -276,7 +276,7 @@ export class WcToast extends LitElement {
    */
   show(detail: ToastDetail): number | null {
     if (typeof detail?.message !== 'string' || detail.message.length === 0) {
-      console.error('[wc-toast] ignored a toast with no message:', detail);
+      console.error('[beam-toast] ignored a toast with no message:', detail);
       return null;
     }
     const id = this.nextId++;
@@ -329,7 +329,7 @@ export class WcToast extends LitElement {
   private handleToast = (event: Event): void => {
     const detail = (event as CustomEvent<Partial<ToastDetail>>).detail;
     if (!detail || typeof detail.message !== 'string' || detail.message.length === 0) {
-      console.error('[wc-toast] ignored an event with an invalid detail:', detail);
+      console.error('[beam-toast] ignored an event with an invalid detail:', detail);
       return;
     }
     this.show(detail as ToastDetail);
@@ -362,7 +362,7 @@ export class WcToast extends LitElement {
       region.showPopover();
       this.promotedId = this.arrivedId;
     } catch (error) {
-      console.warn('[wc-toast] could not sync the popover state:', error);
+      console.warn('[beam-toast] could not sync the popover state:', error);
     }
   }
 
@@ -372,7 +372,7 @@ export class WcToast extends LitElement {
     try {
       action.onClick();
     } catch (error) {
-      console.error('[wc-toast] the toast action threw:', error);
+      console.error('[beam-toast] the toast action threw:', error);
     }
     this.drop(toast.id);
   }
@@ -434,6 +434,6 @@ export class WcToast extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-toast': WcToast;
+    'beam-toast': BeamToast;
   }
 }

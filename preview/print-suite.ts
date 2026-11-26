@@ -8,7 +8,7 @@ type StyledCtor = typeof LitElement;
  * Assert a component hides its own chrome on paper.
  *
  * The print sheet used to do this from the document with
- * `wc-app-shell::part(sidebar)` and a list of `wc-*` tag names, none of which
+ * `beam-app-shell::part(sidebar)` and a list of tag names, none of which
  * could match: the shell and its neighbours live inside `the app`'s shadow
  * root. Token repainting still rides the document sheet, because custom
  * properties inherit through boundaries — but hiding an element is a rule

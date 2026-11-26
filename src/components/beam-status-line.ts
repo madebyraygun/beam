@@ -3,8 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { baseCss } from '../theme/index.js';
 import { NAVIGATE_EVENT, STATUS_ACTION_EVENT, emit } from '../events.js';
-import { dispatchPaletteOpen, type PaletteScope } from './wc-breadcrumb.js';
-import './wc-monogram.js';
+import { dispatchPaletteOpen, type PaletteScope } from './beam-breadcrumb.js';
+import './beam-monogram.js';
 import '../icons/icons.js';
 
 /**
@@ -19,7 +19,7 @@ export interface StatusSegment {
    */
   id: string;
   label: string;
-  /** Tag name of a `wc-icon-*` element drawn before the label. */
+  /** Tag name of an icon element (`beam-icon-*`, or an app's own) drawn before the label. */
   icon?: string;
   /** The icon's size in pixels. The icon's own default when absent. */
   iconSize?: number;
@@ -66,8 +66,8 @@ export interface StatusSegment {
  * app wants on the line. The line is a desktop furnishing and stands down
  * below the mobile breakpoint.
  */
-@customElement('wc-status-line')
-export class WcStatusLine extends LitElement {
+@customElement('beam-status-line')
+export class BeamStatusLine extends LitElement {
   static styles = [
     baseCss,
     css`
@@ -135,11 +135,11 @@ export class WcStatusLine extends LitElement {
         color: var(--beam-color-text);
       }
 
-      .workspace wc-monogram {
+      .workspace beam-monogram {
         --beam-monogram-size: 14px;
       }
 
-      .workspace wc-monogram::part(tile) {
+      .workspace beam-monogram::part(tile) {
         border-radius: var(--beam-radius-xs);
         font-size: 7px;
         font-weight: var(--beam-font-weight-semibold);
@@ -321,7 +321,7 @@ export class WcStatusLine extends LitElement {
               title=${this.switchLabel}
               @click=${(e: Event) => dispatchPaletteOpen(e.currentTarget!, this.switchScope)}
             >
-              <wc-monogram name=${this.workspaceName} seed=${this.workspaceKey}></wc-monogram>
+              <beam-monogram name=${this.workspaceName} seed=${this.workspaceKey}></beam-monogram>
               <span class="workspace-name">${this.workspaceName}</span>
             </button>`
           : nothing
@@ -337,7 +337,7 @@ export class WcStatusLine extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-status-line': WcStatusLine;
+    'beam-status-line': BeamStatusLine;
   }
   interface HTMLElementEventMap {
     [STATUS_ACTION_EVENT]: CustomEvent<{ id: string }>;

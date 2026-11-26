@@ -2,12 +2,12 @@ import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { baseCss } from '../theme/index.js';
 import { NAVIGATE_EVENT, REFRESH_EVENT, SIDEBAR_TOGGLE_EVENT, emit } from '../events.js';
-import './wc-toast.js';
-import './wc-breadcrumb.js';
-import './wc-search-pill.js';
-import './wc-status-line.js';
-import type { StatusSegment } from './wc-status-line.js';
-import type { BreadcrumbItem } from './wc-breadcrumb.js';
+import './beam-toast.js';
+import './beam-breadcrumb.js';
+import './beam-search-pill.js';
+import './beam-status-line.js';
+import type { StatusSegment } from './beam-status-line.js';
+import type { BreadcrumbItem } from './beam-breadcrumb.js';
 import '../icons/icons.js';
 
 /** The width at which the sidebar stops being a column and becomes a drawer. */
@@ -48,8 +48,8 @@ export function narrowViewport(query: NarrowQuery | undefined = defaultNarrowQue
  * drawer's toggle. Which screen is showing is the app's screen registry's
  * business; the shell is handed its title and trail.
  */
-@customElement('wc-app-shell')
-export class WcAppShell extends LitElement {
+@customElement('beam-app-shell')
+export class BeamAppShell extends LitElement {
   static styles = [
     baseCss,
     css`
@@ -91,7 +91,7 @@ export class WcAppShell extends LitElement {
         box-sizing: border-box;
       }
 
-      wc-breadcrumb {
+      beam-breadcrumb {
         flex: 0 1 auto;
       }
 
@@ -234,7 +234,7 @@ export class WcAppShell extends LitElement {
          40-character strip, so on a phone the sidebar stops being a column:
          it lies over the content and slides away when it is not wanted. The
          collapsed rail is the wide-viewport answer and stands down here —
-         wc-nav-sidebar cancels its own rail styling at the same width. */
+         beam-nav-sidebar cancels its own rail styling at the same width. */
       @media (max-width: 48rem) {
         ::slotted([slot='sidebar']) {
           position: fixed;
@@ -481,20 +481,20 @@ export class WcAppShell extends LitElement {
                 aria-expanded=${this.sidebarCollapsed ? 'false' : 'true'}
                 @click=${() => this.requestSidebar(!this.sidebarCollapsed)}
               >
-                <wc-icon-menu></wc-icon-menu>
+                <beam-icon-menu></beam-icon-menu>
               </button>`}
-          <wc-breadcrumb
+          <beam-breadcrumb
             workspace-name=${this.workspaceName}
             workspace-key=${this.workspaceKey}
             switch-label=${this.switchLabel}
             switch-scope=${this.switchScope}
             .trail=${this.trail}
-          ></wc-breadcrumb>
+          ></beam-breadcrumb>
           <span class="spacer"></span>
-          <wc-search-pill
+          <beam-search-pill
             shortcut=${this.searchShortcut}
             key-shortcuts=${this.searchKeyShortcuts}
-          ></wc-search-pill>
+          ></beam-search-pill>
           <button
             type="button"
             class="icon-button refresh"
@@ -503,7 +503,7 @@ export class WcAppShell extends LitElement {
             title=${this.refreshLabel}
             @click=${this.requestRefresh}
           >
-            <wc-icon-refresh></wc-icon-refresh>
+            <beam-icon-refresh></beam-icon-refresh>
           </button>
         </header>
         <div class=${this.hasBanner ? 'banner filled' : 'banner'} part="banner">
@@ -522,24 +522,24 @@ export class WcAppShell extends LitElement {
           <slot></slot>
         </main>
         ${this.statusSegments
-          ? html`<wc-status-line
+          ? html`<beam-status-line
               part="status-line"
               workspace-name=${this.workspaceName}
               workspace-key=${this.workspaceKey}
               switch-label=${this.switchLabel}
               switch-scope=${this.switchScope}
               .segments=${this.statusSegments}
-            ></wc-status-line>`
+            ></beam-status-line>`
           : nothing}
       </div>
-      <wc-toast></wc-toast>
+      <beam-toast></beam-toast>
     `;
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-app-shell': WcAppShell;
+    'beam-app-shell': BeamAppShell;
   }
   interface HTMLElementEventMap {
     [REFRESH_EVENT]: CustomEvent<void>;

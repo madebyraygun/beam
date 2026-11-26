@@ -12,7 +12,7 @@ const grid = (style = '') => html`
         <div style="display:grid;justify-items:center;gap:6px;text-align:center;">
           ${document.createElement(tag)}
           <span style="font-size:10px;color:var(--beam-color-muted);"
-            >${tag.replace('wc-icon-', '')}</span
+            >${tag.replace('beam-icon-', '')}</span
           >
         </div>
       `,
@@ -20,15 +20,8 @@ const grid = (style = '') => html`
   </div>
 `;
 
-/**
- * Every mark that stands in for a character a monospace face may have no glyph for.
- * `wc-icon-dot` belongs here rather than in the status family: it is the
- * neutral mark, drawn for a status outside the six and for a send step not
- * started, and both of its uses are inline.
- */
-const INLINE_TAGS = ICON_TAGS.filter(
-  (tag) => tag.startsWith('wc-icon-status-') || tag === 'wc-icon-dot',
-);
+/** Marks drawn in a run of text, sized by it with `inline`. */
+const INLINE_TAGS = ['beam-icon-flag', 'beam-icon-chevron-down'] as const;
 
 /** One icon sized to the text around it rather than to the token. */
 function inlineIcon(tag: string) {
@@ -42,7 +35,7 @@ const preview: Preview = {
   title: 'Icons',
   group: 'Foundations',
   description:
-    'WcIconBase subclasses. Sized by --beam-icon-size, or by the surrounding type with the inline attribute; colored by currentColor. Decorative unless given a label.',
+    'BeamIconBase subclasses. Sized by --beam-icon-size, or by the surrounding type with the inline attribute; colored by currentColor. Decorative unless given a label.',
   layout: 'stack',
   states: [
     { name: 'default', render: () => grid() },
@@ -55,19 +48,17 @@ const preview: Preview = {
     {
       name: 'labelled',
       render: () =>
-        html`<wc-icon-flag label="Flagged transaction"></wc-icon-flag>`,
+        html`<beam-icon-flag label="Flagged transaction"></beam-icon-flag>`,
     },
     {
-      // These marks stand in for characters a monospace face may have no glyph for, so
-      // what matters is how they read beside the mono text they accompany —
-      // which is what `inline` is for, and the only way they are ever drawn.
+      // An icon set in a run of text tracks the text with `inline`.
       name: 'inline-with-text',
       render: () => html`
         <p style="max-width:60ch;">
           ${INLINE_TAGS.map(
             (tag) => html`
               <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-end:12px;">
-                ${inlineIcon(tag)}${tag.replace('wc-icon-status-', '').replace('wc-icon-', '')}
+                ${inlineIcon(tag)}${tag.replace('beam-icon-', '')}
               </span>
             `,
           )}

@@ -7,7 +7,7 @@ import '../icons/icons.js';
 export interface NavItem {
   id: string;
   label: string;
-  /** Tag name of a `wc-icon-*` element. */
+  /** Tag name of an icon element (`beam-icon-*`, or an app's own). */
   icon?: string;
   disabled?: boolean;
   /**
@@ -46,8 +46,8 @@ function groupsOf(items: NavItem[]): NavGroup[] {
  * other state with `beam-sidebar-toggle`, the same request the shell's own
  * toggle makes.
  */
-@customElement('wc-nav-sidebar')
-export class WcNavSidebar extends LitElement {
+@customElement('beam-nav-sidebar')
+export class BeamNavSidebar extends LitElement {
   static styles = [
     baseCss,
     css`
@@ -249,7 +249,7 @@ export class WcNavSidebar extends LitElement {
         }
       }
 
-      /* Screen chrome, not part of the report. This lives here rather than in
+      /* Screen chrome, not part of the printed page. This lives here rather than in
          a document print sheet because a rule that hides an element has to be
          in the tree that element is in. */
       @media print {
@@ -330,7 +330,7 @@ export class WcNavSidebar extends LitElement {
           aria-expanded=${this.collapsed ? 'false' : 'true'}
           @click=${this.requestToggle}
         >
-          <wc-icon-menu></wc-icon-menu>
+          <beam-icon-menu></beam-icon-menu>
         </button>
         <slot name="mark"></slot>
         ${this.productName
@@ -366,7 +366,7 @@ export class WcNavSidebar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wc-nav-sidebar': WcNavSidebar;
+    'beam-nav-sidebar': BeamNavSidebar;
   }
   interface HTMLElementEventMap {
     [NAVIGATE_EVENT]: CustomEvent<{ id: string }>;

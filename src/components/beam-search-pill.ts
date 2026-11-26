@@ -1,7 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { baseCss } from "../theme/index.js";
-import { dispatchPaletteOpen } from "./wc-breadcrumb.js";
+import { dispatchPaletteOpen } from "./beam-breadcrumb.js";
 import "../icons/icons.js";
 
 /**
@@ -9,8 +9,8 @@ import "../icons/icons.js";
  * (`beam-palette-open` with scope `all`). The keycap shows the shortcut that
  * does the same; which key that is on this platform is the app's to say.
  */
-@customElement("wc-search-pill")
-export class WcSearchPill extends LitElement {
+@customElement("beam-search-pill")
+export class BeamSearchPill extends LitElement {
   static styles = [
     baseCss,
     css`
@@ -42,7 +42,7 @@ export class WcSearchPill extends LitElement {
         border-color: var(--beam-color-accent);
       }
 
-      wc-icon-search {
+      beam-icon-search {
         --beam-icon-size: 15px;
       }
 
@@ -105,7 +105,7 @@ export class WcSearchPill extends LitElement {
         aria-keyshortcuts=${this.keyShortcuts}
         @click=${(event: Event) => dispatchPaletteOpen(event.currentTarget as HTMLElement, "all")}
       >
-        <wc-icon-search></wc-icon-search>
+        <beam-icon-search></beam-icon-search>
         <span class="word">${this.label}</span>
         <kbd part="keycap" aria-hidden="true">${this.shortcut}</kbd>
       </button>
@@ -115,6 +115,6 @@ export class WcSearchPill extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "wc-search-pill": WcSearchPill;
+    "beam-search-pill": BeamSearchPill;
   }
 }
