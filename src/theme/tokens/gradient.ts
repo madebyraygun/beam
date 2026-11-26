@@ -1,0 +1,230 @@
+import { css, unsafeCSS } from 'lit';
+
+/**
+ * Nigel's pastel rainbow, in the order `GRADIENT` declares it in
+ * `crates/nigel/src/effects.rs`. The TUI splash, goodbye, onboarding, and snake screens
+ * interpolate along these stops; the web UI reuses them so the two front ends
+ * are recognisably the same product.
+ *
+ * These are decorative values. Every solid interactive or semantic color in
+ * `color.ts` is a darkened derivation that clears WCAG AA — a pastel on white
+ * does not.
+ */
+export const NIGEL_PALETTE = [
+  '#ffb3ba', // soft pink
+  '#ffc8a2', // peach
+  '#ffe0a3', // pastel yellow
+  '#c9ffcb', // mint
+  '#bae1ff', // pastel cyan
+  '#c4b7ff', // lavender
+  '#ffb3de', // soft magenta
+] as const;
+
+/**
+ * The same seven hues, taken to a lightness that survives a light surface.
+ *
+ * The pastels are the brand, and on a near-white header a pastel wordmark is
+ * very nearly invisible. These keep each stop's hue and trade its lightness
+ * for saturation, so the ramp still reads as the rainbow rather than as seven
+ * arbitrary colours — every stop clears 4.5:1 on the sidebar, which
+ * `contrast.test.ts` holds it to.
+ *
+ * `NIGEL_PALETTE` itself is untouched, which matters: `palette-parity.test.ts`
+ * pins it to `GRADIENT` in `crates/nigel/src/effects.rs` so the TUI and the browser cannot
+ * drift, and this is a second, browser-only ramp rather than an edit to the
+ * shared one. Dark mode keeps the pastels — see `--nc-grad-brand-text` in
+ * `color.ts`.
+ */
+export const NIGEL_PALETTE_INK = [
+  '#c22e3b', // pink   -> deep rose
+  '#9b5524', // peach  -> burnt orange
+  '#84621f', // yellow -> ochre
+  '#1c781f', // mint   -> leaf green
+  '#266ba1', // cyan   -> steel blue
+  '#6951d6', // lavender -> violet
+  '#ba2c7c', // magenta -> fuchsia
+] as const;
+
+/**
+ * The ramp with its first stop repeated at the end, which is how `GRADIENT` in
+ * `crates/nigel/src/effects.rs` is written: the interpolation runs over seven segments and
+ * closes on the colour it started from, so a phase that keeps advancing cycles
+ * smoothly instead of snapping back at the wrap.
+ */
+const CLOSED_RAMP = [...NIGEL_PALETTE, NIGEL_PALETTE[0]].map((hex) => [
+  parseInt(hex.slice(1, 3), 16),
+  parseInt(hex.slice(3, 5), 16),
+  parseInt(hex.slice(5, 7), 16),
+]);
+
+/**
+ * The setup wordmark's six-stop ramp, peach through mint. Dark mode keeps the
+ * pastels; light mode takes each stop to an ink that holds on a pale surface.
+ */
+export const WORDMARK_RAMP_DARK = [
+  '#ffc8a2',
+  '#ffb3ba',
+  '#ffb3de',
+  '#c4b7ff',
+  '#bae1ff',
+  '#c9ffcb',
+] as const;
+
+export const WORDMARK_RAMP_LIGHT = [
+  '#9b5524',
+  '#c22e3b',
+  '#ba2c7c',
+  '#6951d6',
+  '#266ba1',
+  '#1c781f',
+] as const;
+
+const hex2 = (n: number) => n.toString(16).padStart(2, '0');
+
+/**
+ * The colour at position `t` along the closed ramp, as `#rrggbb`.
+ *
+ * A port of `effects::gradient_color`, down to truncating each channel rather
+ * than rounding it (Rust's `as u8`), so the browser and the terminal paint the
+ * snake and the wordmark the same colours at the same phase. `t` is a
+ * position, not a fraction of anything: it wraps, so a caller can keep adding
+ * to it frame after frame, and a negative value wraps the same way
+ * `rem_euclid` does.
+ */
+export function gradientColor(t: number): string {
+  const wrapped = ((t % 1) + 1) % 1;
+  const segments = CLOSED_RAMP.length - 1;
+  const scaled = wrapped * segments;
+  const idx = Math.min(Math.trunc(scaled), CLOSED_RAMP.length - 2);
+  const frac = scaled - idx;
+
+  const from = CLOSED_RAMP[idx];
+  const to = CLOSED_RAMP[idx + 1];
+  const channel = (i: number) => hex2(Math.trunc(from[i] + (to[i] - from[i]) * frac));
+
+  return `#${channel(0)}${channel(1)}${channel(2)}`;
+}
+
+// unsafeCSS is required to interpolate anything that is not itself a
+// CSSResult. The value is a join of the frozen hex literals above — no input
+// reaches it — so there is nothing here for a stylesheet injection to ride in on.
+const ramp = unsafeCSS(NIGEL_PALETTE.join(', '));
+const inkRamp = unsafeCSS(NIGEL_PALETTE_INK.join(', '));
+
+/** The setup wordmark's light ramp as one diagonal gradient. */
+export const wordmarkRampLight = css`linear-gradient(160deg, ${unsafeCSS(WORDMARK_RAMP_LIGHT.join(', '))})`;
+/** The setup wordmark's dark ramp as one diagonal gradient. */
+export const wordmarkRampDark = css`linear-gradient(160deg, ${unsafeCSS(WORDMARK_RAMP_DARK.join(', '))})`;
+
+/**
+ * The plain ramp, drawn once across whatever it fills.
+ *
+ * This is what the wordmark wants and what `--nc-grad-brand` is deliberately
+ * not: a periodic image sized for the drift renders at six-thirteenths scale
+ * and tiled in anything that does not also set `--nc-grad-brand-size`, and
+ * gradient text sets neither.
+ */
+export const brandRamp = css`linear-gradient(90deg, ${ramp})`;
+
+/**
+ * The brand ramp as a *periodic* image, so the wordmark's drift can loop.
+ *
+ * Counted in the ramp's own step — seven stops across the element is six gaps,
+ * so a step is a sixth of the element's width. One period is the ramp plus a
+ * seventh step wrapping magenta back to pink, and the image is a period plus
+ * the ramp: thirteen steps. That is what `--nc-grad-brand-size` says, and it
+ * is the whole trick — `background-position: 100%` offsets by image minus
+ * element, which is thirteen steps minus six, exactly one period, so the loop
+ * has no seam and no jump wherever the pointer leaves.
+ *
+ * At rest the element shows steps 0-6, which is pink at the left edge and
+ * magenta at the right: the same seven stops in the same places the plain
+ * `linear-gradient` put them, so a ramp that never moves looks unchanged.
+ * The wrap segment lives off the right-hand edge until the drift brings it in.
+ *
+ * Anything reading `--nc-grad-brand` therefore has to set
+ * `--nc-grad-brand-size` as its `background-size`, or it gets the ramp at
+ * six-thirteenths scale, tiled. The two are declared together below for that
+ * reason.
+ */
+const GAPS = NIGEL_PALETTE.length - 1;
+const PERIOD_STEPS = NIGEL_PALETTE.length;
+const IMAGE_STEPS = GAPS + PERIOD_STEPS;
+const at = (step: number): string => `${((step / IMAGE_STEPS) * 100).toFixed(4)}%`;
+
+const cycleFrom = (palette: readonly string[]): string => {
+  const stops = [
+    ...palette.map((color, i) => `${color} ${at(i)}`),
+    `${palette[0]} ${at(PERIOD_STEPS)}`,
+  ].join(', ');
+  return `repeating-linear-gradient(90deg, ${stops})`;
+};
+
+const cycle = unsafeCSS(cycleFrom(NIGEL_PALETTE));
+const inkCycle = unsafeCSS(cycleFrom(NIGEL_PALETTE_INK));
+const cycleSize = unsafeCSS(`${((IMAGE_STEPS / GAPS) * 100).toFixed(4)}% 100%`);
+
+/**
+ * The pastel cycle as a value `color.ts` can name in dark mode, where the
+ * wordmark keeps the pastels. Both ramps have seven stops, so one
+ * `--nc-grad-brand-size` serves either.
+ */
+export const brandCycle = css`
+  ${cycle}
+`;
+
+const pastelStops = unsafeCSS(
+  NIGEL_PALETTE.map((hex, i) => `    --nc-color-pastel-${i + 1}: ${hex};`).join('\n'),
+);
+
+/** How many `--nc-color-pastel-*` tokens there are. */
+export const PASTEL_COUNT = NIGEL_PALETTE.length;
+
+export const gradientCss = css`
+  :root {
+    --nc-grad-brand: ${cycle};
+    --nc-grad-brand-size: ${cycleSize};
+    --nc-grad-brand-soft: linear-gradient(
+      90deg,
+      rgb(255 179 186 / 18%),
+      rgb(255 200 162 / 18%),
+      rgb(255 224 163 / 18%),
+      rgb(201 255 203 / 18%),
+      rgb(186 225 255 / 18%),
+      rgb(196 183 255 / 18%),
+      rgb(255 179 222 / 18%)
+    );
+
+    /* The plain pastel ramp in both modes, drawn once across what it fills:
+       the status line's nigel block, which carries --nc-color-on-gradient. */
+    --nc-grad-pastel: ${brandRamp};
+
+    /* Gradient text on a light surface — the wordmark. Overridden back to the
+       pastel ramp in dark mode, where the pastels are the legible choice. */
+    --nc-grad-brand-text: linear-gradient(90deg, ${inkRamp});
+
+    /* The setup wordmark: one diagonal ramp across the whole mark, and the
+       soft wash behind it. */
+    --nc-grad-wordmark: ${wordmarkRampLight};
+    --nc-glow-wordmark: radial-gradient(
+      ellipse 55% 45% at 50% 32%,
+      rgb(196 183 255 / 35%),
+      transparent 70%
+    );
+
+    /* The same ramp made periodic, for the wordmark's drift. Sized by
+       --nc-grad-brand-size like every other periodic image here. */
+    --nc-grad-brand-text-cycle: ${inkCycle};
+
+    /* Text drawn on the gradient itself. Deliberately not mode-dependent and
+       deliberately not --wa-color-text: the ramp above is the same pastel in
+       light and dark, so a foreground that flips with the mode is unreadable
+       in one of them. Held against every stop by contrast.test.ts. */
+    --nc-color-on-gradient: #2b2b33;
+
+    /* The seven pastels one at a time, for a tile that takes one colour from
+       the ramp — a book's monogram. Not mode-dependent, and always carrying
+       --nc-color-on-gradient. */
+    ${pastelStops}
+  }
+`;
