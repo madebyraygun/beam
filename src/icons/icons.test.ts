@@ -71,14 +71,14 @@ describe('icons', () => {
 });
 
 /**
- * One mechanism for the marks that sit in text, rather than a `--nc-icon-size:
+ * One mechanism for the marks that sit in text, rather than a `--beam-icon-size:
  * 1em` line repeated in every component that draws one.
  */
 describe('inline sizing', () => {
   it('is a mode of its own, leaving the token to size everything else', () => {
     const css = sheet(WcIconBase);
-    expect(css).toContain('width: var(--nc-icon-size)');
-    expect(css).toContain('height: var(--nc-icon-size)');
+    expect(css).toContain('width: var(--beam-icon-size)');
+    expect(css).toContain('height: var(--beam-icon-size)');
     // A separate rule behind the attribute, so nothing gets 1em by default.
     expect(css).toMatch(/:host\(\[inline\]\)\s*{\s*width:\s*1em;\s*height:\s*1em;\s*}/);
   });

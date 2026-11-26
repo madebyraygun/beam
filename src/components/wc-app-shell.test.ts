@@ -1,11 +1,11 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import './wc-app-shell.js';
 import { WcAppShell, type NarrowQuery } from './wc-app-shell.js';
-import { dispatchNcToast } from './wc-toast.js';
+import { dispatchToast } from './wc-toast.js';
 import { demoSegments } from './__mocks__/status.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
-import { styleText } from '../../preview/controls-suite.js';
+import { styleText } from '../../preview/style-text.js';
 import {
   describeColumnLayout,
   describePrintsAsBlock,
@@ -90,7 +90,7 @@ describe('wc-app-shell', () => {
     const toast = el.shadowRoot?.querySelector('wc-toast');
     await toast?.updateComplete;
 
-    dispatchNcToast(el, { message: 'Saved.' });
+    dispatchToast(el, { message: 'Saved.' });
     await toast?.updateComplete;
 
     expect(toast?.shadowRoot?.querySelector('.toast')?.textContent).toContain('Saved.');
@@ -109,7 +109,7 @@ describe('wc-app-shell', () => {
     const parts = [...(el.shadowRoot?.querySelectorAll('[part]') ?? [])].map((node) =>
       node.getAttribute('part'),
     );
-    expect(parts).toEqual(['sidebar', 'header', 'nav-toggle', 'banner', 'content']);
+    expect(parts).toEqual(['sidebar', 'header', 'nav-toggle', 'refresh', 'banner', 'content']);
   });
 
   it('exposes the page heading as a part when it draws one', async () => {
@@ -253,7 +253,7 @@ describe('wc-app-shell sidebar toggle', () => {
   it('asks for the sidebar to be put away when it is showing', async () => {
     const el = await mount({ sidebarCollapsed: false });
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
@@ -265,7 +265,7 @@ describe('wc-app-shell sidebar toggle', () => {
   it('asks for the sidebar back when it is put away', async () => {
     const el = await mount({ sidebarCollapsed: true });
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
@@ -310,7 +310,7 @@ describe('wc-app-shell drawer', () => {
   it('closes the drawer when the backdrop is pressed', async () => {
     const el = await mount({ narrowQuery: viewport(true), sidebarCollapsed: false });
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
@@ -322,7 +322,7 @@ describe('wc-app-shell drawer', () => {
   it('closes the drawer on Escape', async () => {
     const el = await mount({ narrowQuery: viewport(true), sidebarCollapsed: false });
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
@@ -338,12 +338,12 @@ describe('wc-app-shell drawer', () => {
     sidebar.slot = 'sidebar';
     el.appendChild(sidebar);
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
     sidebar.dispatchEvent(
-      new CustomEvent('nc-navigate', {
+      new CustomEvent('beam-navigate', {
         detail: { id: 'register' },
         bubbles: true,
         composed: true,
@@ -361,12 +361,12 @@ describe('wc-app-shell drawer', () => {
     sidebar.slot = 'sidebar';
     el.appendChild(sidebar);
     let asked: boolean | undefined;
-    el.addEventListener('nc-sidebar-toggle', (e) => {
+    el.addEventListener('beam-sidebar-toggle', (e) => {
       asked = e.detail.collapsed;
     });
 
     sidebar.dispatchEvent(
-      new CustomEvent('nc-navigate', {
+      new CustomEvent('beam-navigate', {
         detail: { id: 'register' },
         bubbles: true,
         composed: true,
@@ -411,7 +411,7 @@ describe('wc-app-shell on a phone', () => {
 
   it('slides the drawer off-canvas when the sidebar is put away', () => {
     expect(text).toMatch(
-      /@media \(max-width: 48rem\)[\s\S]*:host\(\[sidebar-collapsed\]\)[^{]*::slotted\(\[slot='sidebar'\]\)[^{]*{[^}]*transform:\s*translateX\(calc\(-100% - 2 \* var\(--nc-window-inset\)\)\)/,
+      /@media \(max-width: 48rem\)[\s\S]*:host\(\[sidebar-collapsed\]\)[^{]*::slotted\(\[slot='sidebar'\]\)[^{]*{[^}]*transform:\s*translateX\(calc\(-100% - 2 \* var\(--beam-window-inset\)\)\)/,
     );
   });
 
@@ -432,12 +432,12 @@ describe('wc-app-shell top bar', () => {
     document.body.innerHTML = '';
   });
 
-  it('hands the book and the trail to the breadcrumb', async () => {
+  it('hands the workspace and the trail to the breadcrumb', async () => {
     const trail = [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }];
-    const el = await mount({ bookName: 'Acme Consulting LLC', bookKey: 'acme', trail });
+    const el = await mount({ workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme', trail });
     const crumb = el.shadowRoot?.querySelector('wc-breadcrumb');
-    expect(crumb?.bookName).toBe('Acme Consulting LLC');
-    expect(crumb?.bookKey).toBe('acme');
+    expect(crumb?.workspaceName).toBe('Acme Consulting LLC');
+    expect(crumb?.workspaceKey).toBe('acme');
     expect(crumb?.trail).toEqual(trail);
   });
 
@@ -446,14 +446,14 @@ describe('wc-app-shell top bar', () => {
     const header = el.shadowRoot?.querySelector('header');
     expect(header?.querySelector('wc-breadcrumb')).toBeTruthy();
     expect(header?.querySelector('wc-search-pill')).toBeTruthy();
-    expect(header?.querySelector('wa-button.refresh wc-icon-refresh[label="Refresh"]')).toBeTruthy();
+    expect(header?.querySelector('button.refresh[aria-label="Refresh"] wc-icon-refresh')).toBeTruthy();
   });
 
   it('asks for a refresh rather than doing one', async () => {
     const el = await mount();
     let asked = 0;
-    el.addEventListener('nc-refresh', () => (asked += 1));
-    el.shadowRoot?.querySelector<HTMLButtonElement>('wa-button.refresh')?.click();
+    el.addEventListener('beam-refresh', () => (asked += 1));
+    el.shadowRoot?.querySelector<HTMLButtonElement>('button.refresh')?.click();
     expect(asked).toBe(1);
   });
 
@@ -510,7 +510,7 @@ describe('wc-app-shell without a sidebar', () => {
   });
 
   it('keeps the breadcrumb and the top bar', async () => {
-    const el = await mount({ hideSidebar: true, bookName: 'Acme Consulting LLC' });
+    const el = await mount({ hideSidebar: true, workspaceName: 'Acme Consulting LLC' });
     expect(el.shadowRoot?.querySelector('header wc-breadcrumb')).toBeTruthy();
     expect(el.shadowRoot?.querySelector('header wc-search-pill')).toBeTruthy();
   });
@@ -530,13 +530,13 @@ describe('wc-app-shell status line', () => {
     document.body.innerHTML = '';
   });
 
-  const segments = demoSegments({ path: '~/Documents/Nigel/acme-consulting', encrypted: true, version: '1.0' });
+  const segments = demoSegments({ path: '~/work/acme-consulting', encrypted: true, version: '1.0' });
 
   it('draws the status line below the content from what it is handed', async () => {
-    const el = await mount({ bookName: 'Acme Consulting LLC', bookKey: 'acme', statusSegments: segments });
+    const el = await mount({ workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme', statusSegments: segments });
     const line = el.shadowRoot?.querySelector('main + wc-status-line');
-    expect(line?.getAttribute('book-name')).toBe('Acme Consulting LLC');
-    expect(line?.getAttribute('book-key')).toBe('acme');
+    expect(line?.getAttribute('workspace-name')).toBe('Acme Consulting LLC');
+    expect(line?.getAttribute('workspace-key')).toBe('acme');
     expect((line as unknown as { segments: unknown }).segments).toBe(segments);
   });
 
@@ -546,7 +546,7 @@ describe('wc-app-shell status line', () => {
   });
 
   it('draws the line with the name alone for an empty list', async () => {
-    const el = await mount({ bookName: 'Example board', statusSegments: [] });
+    const el = await mount({ workspaceName: 'Example board', statusSegments: [] });
     expect(el.shadowRoot?.querySelector('wc-status-line')).not.toBeNull();
   });
 });

@@ -4,7 +4,7 @@ import { WcNavSidebar } from './wc-nav-sidebar.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
 import { NAV_ITEMS, NAV_ITEMS_WITH_DISABLED } from './__mocks__/nav.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
-import { styleText } from '../../preview/controls-suite.js';
+import { styleText } from '../../preview/style-text.js';
 import preview from './wc-nav-sidebar.preview.js';
 
 async function mount(props: Partial<WcNavSidebar> = {}): Promise<WcNavSidebar> {
@@ -40,10 +40,10 @@ describe('wc-nav-sidebar', () => {
     expect(button(el, 'dashboard')?.getAttribute('aria-current')).toBe('false');
   });
 
-  it('emits nc-navigate with the item id', async () => {
+  it('emits beam-navigate with the item id', async () => {
     const el = await mount();
     const spy = vi.fn();
-    el.addEventListener('nc-navigate', spy);
+    el.addEventListener('beam-navigate', spy);
 
     button(el, 'register')?.click();
 
@@ -54,16 +54,16 @@ describe('wc-nav-sidebar', () => {
   it('bubbles and composes the event so the app can listen at the shell', async () => {
     const el = await mount();
     const spy = vi.fn();
-    document.body.addEventListener('nc-navigate', spy);
+    document.body.addEventListener('beam-navigate', spy);
     button(el, 'review')?.click();
     expect(spy).toHaveBeenCalledOnce();
-    document.body.removeEventListener('nc-navigate', spy);
+    document.body.removeEventListener('beam-navigate', spy);
   });
 
   it('does not navigate from a disabled item', async () => {
     const el = await mount({ items: NAV_ITEMS_WITH_DISABLED });
     const spy = vi.fn();
-    el.addEventListener('nc-navigate', spy);
+    el.addEventListener('beam-navigate', spy);
 
     button(el, 'register')?.click();
 
@@ -153,7 +153,7 @@ describe('wc-nav-sidebar groups', () => {
   it('draws the active item with the rainbow hairline', () => {
     const text = styleText(WcNavSidebar);
     expect(text).toMatch(
-      /\.item\.active\s*{[^}]*padding-box,\s*var\(--nc-grad-brand-text\) border-box/,
+      /\.item\.active\s*{[^}]*padding-box,\s*var\(--beam-accent-image\) border-box/,
     );
   });
 });
@@ -164,8 +164,8 @@ describe('wc-nav-sidebar header', () => {
   });
 
   it('carries the product name it is given', async () => {
-    const el = await mount({ productName: 'nigel' });
-    expect(el.shadowRoot?.querySelector('.head .wordmark')?.textContent).toBe('nigel');
+    const el = await mount({ productName: 'example' });
+    expect(el.shadowRoot?.querySelector('.head .wordmark')?.textContent).toBe('example');
   });
 
   it('draws no name when it is given none', async () => {
@@ -174,14 +174,14 @@ describe('wc-nav-sidebar header', () => {
   });
 
   it('follows a change of name', async () => {
-    const el = await mount({ productName: 'nigel' });
+    const el = await mount({ productName: 'example' });
     el.productName = 'tack';
     await el.updateComplete;
     expect(el.shadowRoot?.querySelector('.head .wordmark')?.textContent).toBe('tack');
   });
 
   it('has a slot for a mark, before the name', async () => {
-    const el = await mount({ productName: 'nigel' });
+    const el = await mount({ productName: 'example' });
     const head = el.shadowRoot!.querySelector('.head')!;
     const slot = head.querySelector('slot[name="mark"]');
     expect(slot).not.toBeNull();
@@ -191,7 +191,7 @@ describe('wc-nav-sidebar header', () => {
   it('asks to fold to the rail from its hamburger', async () => {
     const el = await mount({ collapsed: false });
     const spy = vi.fn();
-    el.addEventListener('nc-sidebar-toggle', spy);
+    el.addEventListener('beam-sidebar-toggle', spy);
     el.shadowRoot?.querySelector<HTMLButtonElement>('.hamburger')?.click();
     expect(spy.mock.calls[0][0].detail).toEqual({ collapsed: true });
   });
@@ -199,7 +199,7 @@ describe('wc-nav-sidebar header', () => {
   it('asks to open again from the rail', async () => {
     const el = await mount({ collapsed: true });
     const spy = vi.fn();
-    el.addEventListener('nc-sidebar-toggle', spy);
+    el.addEventListener('beam-sidebar-toggle', spy);
     el.shadowRoot?.querySelector<HTMLButtonElement>('.hamburger')?.click();
     expect(spy.mock.calls[0][0].detail).toEqual({ collapsed: false });
   });
@@ -220,7 +220,7 @@ describe('wc-nav-sidebar header', () => {
 
   it('folds over 180ms and stops for anyone who asked motion to stop', () => {
     const text = styleText(WcNavSidebar);
-    expect(text).toMatch(/:host\s*{[^}]*transition:\s*width var\(--nc-transition-sidebar\)/);
+    expect(text).toMatch(/:host\s*{[^}]*transition:\s*width var\(--beam-transition-sidebar\)/);
     expect(text).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*:host\s*{[^}]*transition:\s*none/,
     );
@@ -249,7 +249,7 @@ describe('wc-nav-sidebar on a phone', () => {
 
   it('keeps its full width when it is the drawer', () => {
     expect(text).toMatch(
-      /@media \(max-width: 48rem\)[\s\S]*:host\(\[collapsed\]\)[^{]*{[^}]*width:\s*var\(--nc-sidebar-width/,
+      /@media \(max-width: 48rem\)[\s\S]*:host\(\[collapsed\]\)[^{]*{[^}]*width:\s*var\(--beam-sidebar-width/,
     );
   });
 });

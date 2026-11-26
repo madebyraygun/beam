@@ -59,7 +59,7 @@ axe.configure({
   }
 }
 
-// jsdom's HTMLDialogElement has no showModal()/show()/close(). <wa-dialog>
+// jsdom's HTMLDialogElement has no showModal()/show()/close(). A dialog component
 // calls showModal() internally, so wc-confirm is untestable without these.
 if (typeof window !== 'undefined' && window.HTMLDialogElement) {
   const dialogProto = window.HTMLDialogElement.prototype;
@@ -94,7 +94,7 @@ if (typeof window !== 'undefined' && window.Element) {
 }
 
 // The toast region promotes itself into the top layer so it paints above
-// wa-dialog's native modal. jsdom has no Popover API; without these the
+// a native modal dialog. jsdom has no Popover API; without these the
 // component's guarded calls simply no-op, which is the intended fallback.
 if (typeof window !== 'undefined' && window.HTMLElement) {
   const proto = window.HTMLElement.prototype as HTMLElement & {
@@ -109,7 +109,7 @@ if (typeof window !== 'undefined' && window.HTMLElement) {
   }
 }
 
-// `wa-textarea` with `resize="auto"` observes itself to grow with its text.
+// A textarea that grows with its text observes itself to grow with its text.
 // jsdom has no ResizeObserver, and the throw escapes its `updated()` as an
 // unhandled rejection. Nothing here measures layout, so a stub that never
 // fires is enough — the app's test setup carries the same one.

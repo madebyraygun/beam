@@ -1,11 +1,9 @@
-import '../dist/css/nigel.css';
+import '../dist/css/default.css';
 import { initColorMode } from '../src/theme/index.js';
 import { loadPreviews } from './manifest.js';
-import './app/preview-app.js';
+import { DEMO_STORAGE_KEY } from './app/preview-app.js';
 
-// Half the component states in this library have never been looked at in dark
-// mode; the harness is where that gets fixed.
-initColorMode();
+initColorMode({ storageKey: DEMO_STORAGE_KEY });
 
 const previews = loadPreviews();
 const app = document.createElement('preview-app');

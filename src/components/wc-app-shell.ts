@@ -1,7 +1,7 @@
 import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { controlsCss } from '../theme/index.js';
-import '@awesome.me/webawesome/dist/components/button/button.js';
+import { baseCss } from '../theme/index.js';
+import { NAVIGATE_EVENT, REFRESH_EVENT, SIDEBAR_TOGGLE_EVENT, emit } from '../events.js';
 import './wc-toast.js';
 import './wc-breadcrumb.js';
 import './wc-search-pill.js';
@@ -40,18 +40,18 @@ export function narrowViewport(query: NarrowQuery | undefined = defaultNarrowQue
  * The application frame: the floating sidebar slot, the top bar, a banner
  * slot, the scrolling content area, and the single toast region.
  *
- * The top bar is drawn here from properties — the breadcrumb (book, screen,
+ * The top bar is drawn here from properties — the breadcrumb (the open workspace, the screen,
  * any level below it), the search pill and the refresh button — and the
  * shell says what was asked for with events rather than acting on it:
- * `nc-palette-open` from the book and the pill, `nc-navigate` from an earlier
- * breadcrumb level, `nc-refresh` from refresh, `nc-sidebar-toggle` from the
+ * `beam-palette-open` from the workspace name and the pill, `beam-navigate` from an earlier
+ * breadcrumb level, `beam-refresh` from refresh, `beam-sidebar-toggle` from the
  * drawer's toggle. Which screen is showing is the app's screen registry's
  * business; the shell is handed its title and trail.
  */
 @customElement('wc-app-shell')
 export class WcAppShell extends LitElement {
   static styles = [
-    controlsCss,
+    baseCss,
     css`
       /* Exactly the window: the document never scrolls, only the content
          area does. The dynamic viewport unit follows a phone browser's
@@ -61,11 +61,11 @@ export class WcAppShell extends LitElement {
         display: flex;
         height: 100vh;
         height: 100dvh;
-        background: var(--wa-color-bg);
-        color: var(--wa-color-text);
-        font-family: var(--wa-font-family-sans);
-        font-size: var(--wa-font-size-base);
-        line-height: var(--wa-line-height);
+        background: var(--beam-color-bg);
+        color: var(--beam-color-text);
+        font-family: var(--beam-font-family);
+        font-size: var(--beam-font-size-base);
+        line-height: var(--beam-line-height);
       }
 
       :host([hide-sidebar]) ::slotted([slot='sidebar']) {
@@ -85,8 +85,8 @@ export class WcAppShell extends LitElement {
         align-items: center;
         gap: 10px;
         flex: none;
-        height: var(--nc-header-height);
-        margin-top: var(--nc-window-inset);
+        height: var(--beam-header-height);
+        margin-top: var(--beam-window-inset);
         padding: 0 16px 0 20px;
         box-sizing: border-box;
       }
@@ -108,18 +108,19 @@ export class WcAppShell extends LitElement {
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--wa-color-muted);
+        color: var(--beam-color-muted);
         cursor: default;
-        transition: background var(--nc-transition-fast);
-        --nc-icon-size: 17px;
+        transition: background var(--beam-transition-fast);
+        --beam-icon-size: 17px;
       }
 
       .icon-button:hover {
-        background: var(--nc-color-hover);
+        background: var(--beam-color-hover);
       }
 
+      /* Round, where the drawer toggle below is square. */
       .refresh {
-        flex: none;
+        border-radius: var(--beam-radius-pill);
       }
 
       /* The drawer's toggle: the design's hamburger, a 32px square with 8px
@@ -128,8 +129,8 @@ export class WcAppShell extends LitElement {
          exists on a phone. */
       .nav-toggle {
         display: none;
-        border-radius: var(--wa-radius-md);
-        color: var(--wa-color-text);
+        border-radius: var(--beam-radius-md);
+        color: var(--beam-color-text);
       }
 
       /* Below the breakpoint the sidebar leaves the flow and lies over the
@@ -141,7 +142,7 @@ export class WcAppShell extends LitElement {
         position: fixed;
         inset: 0;
         z-index: 1;
-        background: var(--wa-color-overlay-modal);
+        background: var(--beam-color-overlay);
       }
 
       .banner {
@@ -150,11 +151,11 @@ export class WcAppShell extends LitElement {
 
       .banner.filled {
         display: block;
-        margin: 0 16px var(--wa-space-s) 20px;
-        padding: var(--wa-space-s) var(--wa-space-m);
-        background: var(--wa-color-surface-alt);
-        border: 1px solid var(--wa-color-border);
-        border-radius: var(--wa-radius-md);
+        margin: 0 16px var(--beam-space-s) 20px;
+        padding: var(--beam-space-s) var(--beam-space-m);
+        background: var(--beam-color-surface-alt);
+        border: 1px solid var(--beam-color-border);
+        border-radius: var(--beam-radius-md);
       }
 
       /* A column flex container, so a screen that wants the window can ask
@@ -187,7 +188,7 @@ export class WcAppShell extends LitElement {
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: var(--wa-space-m);
+        gap: var(--beam-space-m);
         flex: none;
       }
 
@@ -214,9 +215,9 @@ export class WcAppShell extends LitElement {
 
       .title {
         margin: 0;
-        font-size: var(--nc-font-size-display);
-        font-weight: var(--wa-font-weight-medium);
-        letter-spacing: var(--nc-letter-spacing-tight);
+        font-size: var(--beam-font-size-display);
+        font-weight: var(--beam-font-weight-medium);
+        letter-spacing: var(--beam-letter-spacing-tight);
         line-height: 1.2;
       }
 
@@ -239,13 +240,13 @@ export class WcAppShell extends LitElement {
           position: fixed;
           inset: 0 auto 0 0;
           z-index: 2;
-          transition: transform var(--nc-transition-base);
+          transition: transform var(--beam-transition-base);
         }
 
         /* Its own width plus the inset either side, so neither the panel's
            edge nor its shadow is left on screen. */
         :host([sidebar-collapsed]) ::slotted([slot='sidebar']) {
-          transform: translateX(calc(-100% - 2 * var(--nc-window-inset)));
+          transform: translateX(calc(-100% - 2 * var(--beam-window-inset)));
         }
 
         .nav-toggle {
@@ -273,13 +274,9 @@ export class WcAppShell extends LitElement {
         }
       }
 
-      /* A printed report is the artifact an accountant keeps, so the page has
-         to be the report and nothing else. This lives here rather than in the
-         print sheet because a rule that hides an element has to be in the
-         tree that element is in, and the shell is inside the app's shadow
-         root. Token recolouring is the other way through the boundary and
-         stays in the theme, where it reaches every component at once by
-         inheritance. */
+      /* On paper the page is the content and nothing else. A rule that
+         hides an element has to be in the tree that element is in, so it is
+         here rather than in a document print sheet. */
       @media print {
         :host {
           display: block;
@@ -332,15 +329,27 @@ export class WcAppShell extends LitElement {
   @property({ type: Boolean, attribute: 'title-hidden' })
   titleHidden = false;
 
-  /** The open book's name, first in the breadcrumb. */
-  @property({ type: String, attribute: 'book-name' })
-  bookName = '';
+  /** The name of what is open, first in the breadcrumb and the status line. */
+  @property({ type: String, attribute: 'workspace-name' })
+  workspaceName = '';
 
-  /** What picks the book's monogram colour. */
-  @property({ type: String, attribute: 'book-key' })
-  bookKey = '';
+  /** What picks its monogram colour: something that names it for good. */
+  @property({ type: String, attribute: 'workspace-key' })
+  workspaceKey = '';
 
-  /** The breadcrumb after the book: the screen, then any level below it. */
+  /** The tooltip on the name, which opens the palette at `switch-scope`. */
+  @property({ type: String, attribute: 'switch-label' })
+  switchLabel = 'Switch workspace';
+
+  /** The palette scope the name asks for. */
+  @property({ type: String, attribute: 'switch-scope' })
+  switchScope = 'workspaces';
+
+  /** The refresh button's name and tooltip. */
+  @property({ type: String, attribute: 'refresh-label' })
+  refreshLabel = 'Refresh';
+
+  /** The breadcrumb after the name: the screen, then any level below it. */
   @property({ attribute: false })
   trail: BreadcrumbItem[] = [];
 
@@ -352,7 +361,7 @@ export class WcAppShell extends LitElement {
   searchKeyShortcuts = 'Meta+K';
 
   /**
-   * What the status line holds besides the book's name. Absent draws no
+   * What the status line holds besides the name. Absent draws no
    * status line, which is what a host window that draws its own chrome asks
    * for; an empty list draws the line with the name alone.
    */
@@ -411,13 +420,13 @@ export class WcAppShell extends LitElement {
     super.connectedCallback();
     this.narrowQuery?.addEventListener?.('change', this.onViewportChange);
     window.addEventListener('keydown', this.onKeyDown);
-    this.addEventListener('nc-navigate', this.onNavigate);
+    this.addEventListener(NAVIGATE_EVENT, this.onNavigate);
   }
 
   disconnectedCallback(): void {
     this.narrowQuery?.removeEventListener?.('change', this.onViewportChange);
     window.removeEventListener('keydown', this.onKeyDown);
-    this.removeEventListener('nc-navigate', this.onNavigate);
+    this.removeEventListener(NAVIGATE_EVENT, this.onNavigate);
     super.disconnectedCallback();
   }
 
@@ -440,17 +449,11 @@ export class WcAppShell extends LitElement {
    * comes back as a property.
    */
   private requestSidebar(collapsed: boolean): void {
-    this.dispatchEvent(
-      new CustomEvent<{ collapsed: boolean }>('nc-sidebar-toggle', {
-        detail: { collapsed },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    emit<{ collapsed: boolean }>(this, SIDEBAR_TOGGLE_EVENT, { collapsed });
   }
 
   private requestRefresh(): void {
-    this.dispatchEvent(new CustomEvent('nc-refresh', { bubbles: true, composed: true }));
+    emit(this, REFRESH_EVENT);
   }
 
   render() {
@@ -481,8 +484,10 @@ export class WcAppShell extends LitElement {
                 <wc-icon-menu></wc-icon-menu>
               </button>`}
           <wc-breadcrumb
-            book-name=${this.bookName}
-            book-key=${this.bookKey}
+            workspace-name=${this.workspaceName}
+            workspace-key=${this.workspaceKey}
+            switch-label=${this.switchLabel}
+            switch-scope=${this.switchScope}
             .trail=${this.trail}
           ></wc-breadcrumb>
           <span class="spacer"></span>
@@ -490,14 +495,16 @@ export class WcAppShell extends LitElement {
             shortcut=${this.searchShortcut}
             key-shortcuts=${this.searchKeyShortcuts}
           ></wc-search-pill>
-          <wa-button
-            class="refresh"
-            appearance="plain"
-            title="Refresh"
+          <button
+            type="button"
+            class="icon-button refresh"
+            part="refresh"
+            aria-label=${this.refreshLabel}
+            title=${this.refreshLabel}
             @click=${this.requestRefresh}
           >
-            <wc-icon-refresh label="Refresh"></wc-icon-refresh>
-          </wa-button>
+            <wc-icon-refresh></wc-icon-refresh>
+          </button>
         </header>
         <div class=${this.hasBanner ? 'banner filled' : 'banner'} part="banner">
           <slot name="banner" @slotchange=${this.onBannerChange}></slot>
@@ -517,8 +524,10 @@ export class WcAppShell extends LitElement {
         ${this.statusSegments
           ? html`<wc-status-line
               part="status-line"
-              book-name=${this.bookName}
-              book-key=${this.bookKey}
+              workspace-name=${this.workspaceName}
+              workspace-key=${this.workspaceKey}
+              switch-label=${this.switchLabel}
+              switch-scope=${this.switchScope}
               .segments=${this.statusSegments}
             ></wc-status-line>`
           : nothing}
@@ -533,6 +542,6 @@ declare global {
     'wc-app-shell': WcAppShell;
   }
   interface HTMLElementEventMap {
-    'nc-refresh': CustomEvent<void>;
+    [REFRESH_EVENT]: CustomEvent<void>;
   }
 }

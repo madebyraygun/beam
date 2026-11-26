@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { PASTEL_COUNT } from '../theme/index.js';
+import { MONOGRAM_TONES } from '../theme/index.js';
 
-/** Company-form suffixes that say nothing about which book this is. */
+/** Company-form suffixes that say nothing about which one this is. */
 const SUFFIXES = new Set(['llc', 'inc', 'ltd', 'co', 'corp', 'plc', 'llp', 'lp', 'gmbh']);
 
 /**
@@ -22,11 +22,11 @@ export function monogramInitials(name: string): string {
 }
 
 /**
- * Which of the pastels a seed lands on, 1 to `PASTEL_COUNT`.
+ * Which tone a seed lands on, 1 to `MONOGRAM_TONES`.
  *
  * FNV-1a over the seed's UTF-16 code units: stable across sessions and
- * machines, so a book keeps its colour wherever it is opened, and spread well
- * enough that two books in one list rarely share one.
+ * machines, so a name keeps its colour wherever it is shown, and spread well
+ * enough that two in one list rarely share one.
  */
 export function monogramTone(seed: string): number {
   let hash = 0x811c9dc5;
@@ -34,71 +34,70 @@ export function monogramTone(seed: string): number {
     hash ^= seed.charCodeAt(i);
     hash = Math.imul(hash, 0x01000193);
   }
-  return ((hash >>> 0) % PASTEL_COUNT) + 1;
+  return ((hash >>> 0) % MONOGRAM_TONES) + 1;
 }
 
 /**
- * A book's monogram: its initials on a pastel tile.
+ * A monogram: a name's initials on a tinted tile.
  *
- * The colour comes from `seed` rather than from the name, so renaming a book
- * keeps its colour; a caller passes whatever identifies the book for good
- * (its folder). Decorative — the name is always printed beside it — so it is
+ * The colour comes from `seed` rather than from the name, so renaming keeps the
+ * colour; a caller passes whatever identifies the thing for good. Decorative — the name is always printed beside it — so it is
  * hidden from assistive tech.
  */
 @customElement('wc-monogram')
 export class WcMonogram extends LitElement {
   static styles = css`
     :host {
-      --nc-monogram-size: 20px;
+      --beam-monogram-size: 20px;
       display: inline-flex;
       flex: none;
     }
 
     :host([size='l']) {
-      --nc-monogram-size: 32px;
+      --beam-monogram-size: 32px;
     }
 
     .tile {
       display: inline-grid;
       place-items: center;
-      width: var(--nc-monogram-size);
-      height: var(--nc-monogram-size);
-      border-radius: var(--wa-radius-sm);
-      background: var(--nc-color-pastel-1);
-      color: var(--nc-color-on-gradient);
-      font-family: var(--wa-font-family-sans);
-      font-size: calc(var(--nc-monogram-size) * 0.45);
-      font-weight: var(--wa-font-weight-bold);
+      width: var(--beam-monogram-size);
+      height: var(--beam-monogram-size);
+      border-radius: var(--beam-radius-sm);
+      background: var(--beam-tone-1);
+      color: var(--beam-color-on-tone);
+      font-family: var(--beam-font-family);
+      font-size: calc(var(--beam-monogram-size) * 0.45);
+      font-weight: var(--beam-font-weight-bold);
       line-height: 1;
       letter-spacing: 0;
     }
 
     :host([size='l']) .tile {
-      border-radius: var(--wa-radius-md);
-      font-size: var(--nc-font-size-caption);
+      border-radius: var(--beam-radius-md);
+      font-size: var(--beam-font-size-caption);
     }
 
     .tone-2 {
-      background: var(--nc-color-pastel-2);
+      background: var(--beam-tone-2);
     }
     .tone-3 {
-      background: var(--nc-color-pastel-3);
+      background: var(--beam-tone-3);
     }
     .tone-4 {
-      background: var(--nc-color-pastel-4);
+      background: var(--beam-tone-4);
     }
     .tone-5 {
-      background: var(--nc-color-pastel-5);
+      background: var(--beam-tone-5);
     }
     .tone-6 {
-      background: var(--nc-color-pastel-6);
+      background: var(--beam-tone-6);
     }
     .tone-7 {
-      background: var(--nc-color-pastel-7);
+      background: var(--beam-tone-7);
     }
   `;
 
-  /** The book's name; the initials come from it. */
+  /** The name; the initials come from it. */
   @property({ type: String })
   name = '';
 

@@ -10,7 +10,7 @@ interface ShellAttrs {
   title?: string;
   active?: string;
   trail?: BreadcrumbItem[];
-  book?: string;
+  workspace?: string;
   collapsed?: boolean;
   hosted?: boolean;
   /** The heading is kept for assistive technology only. */
@@ -24,20 +24,20 @@ const shell = (extra = html``, attrs: ShellAttrs = {}) => {
   const width = attrs.narrow ? '390px' : 'min(1280px, calc(100vw - 32px))';
   return html`
     <div
-      style="width:${width};height:720px;border:1px solid var(--wa-color-border);overflow:hidden;"
+      style="width:${width};height:720px;border:1px solid var(--beam-color-border);overflow:hidden;"
     >
       <wc-app-shell
         screen-title=${title}
         ?title-hidden=${attrs.titleHidden ?? false}
-        book-name=${attrs.book ?? 'Acme Consulting LLC'}
-        book-key="acme-consulting"
+        workspace-name=${attrs.workspace ?? 'Acme Consulting LLC'}
+        workspace-key="acme-consulting"
         .trail=${attrs.trail ?? [{ label: title }]}
         ?sidebar-collapsed=${attrs.collapsed ?? false}
         ?hide-sidebar=${attrs.hosted ?? false}
         .statusSegments=${attrs.hosted
           ? undefined
           : demoSegments({
-              path: '~/Documents/Nigel/acme-consulting',
+              path: '~/work/acme-consulting',
               encrypted: true,
               version: '1.0',
               reviewCount: 84,
@@ -49,13 +49,13 @@ const shell = (extra = html``, attrs: ShellAttrs = {}) => {
           ? html``
           : html`<wc-nav-sidebar
               slot="sidebar"
-              product-name="nigel"
+              product-name="example"
               ?collapsed=${attrs.collapsed ?? false}
               .items=${NAV_ITEMS}
               active=${attrs.active ?? 'dashboard'}
             ></wc-nav-sidebar>`}
         ${extra}
-        <p style="color:var(--wa-color-muted);">Screen content goes here.</p>
+        <p style="color:var(--beam-color-muted);">Screen content goes here.</p>
       </wc-app-shell>
     </div>
   `;
@@ -91,9 +91,9 @@ const preview: Preview = {
         shell(html``, { title: 'Register', active: 'register', titleHidden: true }),
     },
     {
-      name: 'long book name',
+      name: 'long workspace name',
       render: () =>
-        shell(html``, { book: 'Harbor & Vale Architecture and Interiors Partnership LLP' }),
+        shell(html``, { workspace: 'Harbor & Vale Architecture and Interiors Partnership LLP' }),
     },
     { name: 'drawer-open', render: () => shell(html``, { narrow: true }) },
     {
@@ -108,7 +108,7 @@ const preview: Preview = {
       name: 'with-banner',
       render: () =>
         shell(
-          html`<span slot="banner">Session expired — reopen the URL nigel serve printed.</span>`,
+          html`<span slot="banner">Session expired — reopen the link the server printed.</span>`,
         ),
     },
   ],

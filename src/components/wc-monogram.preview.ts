@@ -28,7 +28,7 @@ const preview: Preview = {
   title: 'Monogram',
   group: 'Layout',
   description:
-    'A book’s initials on a pastel tile. The colour is picked from the ramp by hashing a stable key, so a book keeps it.',
+    'A name’s initials on a tinted tile. The tone is picked by hashing a stable key, so a name keeps it.',
   states: [
     { name: 'breadcrumb size', render: () => row('s') },
     { name: 'card size', render: () => row('l') },

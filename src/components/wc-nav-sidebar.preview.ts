@@ -6,8 +6,8 @@ import type { Preview } from '../../preview/types.js';
 
 /** The panel floats in a window-high column, so it gets one to float in. */
 const frame = (items: NavItem[], active: string, collapsed = false) => html`
-  <div style="display:flex;height:620px;background:var(--wa-color-bg);">
-    <wc-nav-sidebar product-name="nigel" .items=${items} active=${active} ?collapsed=${collapsed}></wc-nav-sidebar>
+  <div style="display:flex;height:620px;background:var(--beam-color-bg);">
+    <wc-nav-sidebar product-name="example" .items=${items} active=${active} ?collapsed=${collapsed}></wc-nav-sidebar>
   </div>
 `;
 

@@ -1,6 +1,6 @@
 import type { StatusSegment } from '../wc-status-line.js';
 
-/** What a bookkeeping app says on its status line: the example the tests and previews use. */
+/** What an example app says on its status line: the example the tests and previews use. */
 export interface DemoStatus {
   path?: string;
   fullPath?: string;
@@ -32,7 +32,7 @@ export function demoSegments(status: DemoStatus = {}): StatusSegment[] {
     segments.push({
       id: 'review',
       side: 'end',
-      tone: 'flagged',
+      tone: 'warning',
       icon: 'wc-icon-status-overdue',
       iconSize: 9,
       label: `${reviewCount} to review`,

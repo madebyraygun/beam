@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { LitElement } from 'lit';
-import { styleText } from './controls-suite.js';
+import { styleText } from './style-text.js';
 
 type StyledCtor = typeof LitElement;
 

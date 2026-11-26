@@ -62,7 +62,7 @@ function walk(path: string): string[] {
 describe('the colour matcher', () => {
   it.each([
     'background: #fff;',
-    'color: var(--wa-color-text, #2b2b33);',
+    'color: var(--beam-color-text, #2b2b33);',
     'border: 1px solid #000;',
     "inverse: '#17171d',",
     'box-shadow: 0 0 0 1px rgb(0 0 0 / 10%);',
@@ -81,10 +81,10 @@ describe('the colour matcher', () => {
     "'<h1>Invoice #1251</h1><p>Acme Co — $1,850.00</p>'",
     'Invoice #1248 is overdue',
     'white-space: nowrap;',
-    'background: color-mix(in srgb, var(--wa-color-danger) 10%, var(--wa-color-surface));',
+    'background: color-mix(in srgb, var(--beam-color-danger) 10%, var(--beam-color-surface));',
     'const c = gradientColor(t);',
     'the white card behind it',
-    'color: var(--wa-color-text);',
+    'color: var(--beam-color-text);',
   ])('leaves %s alone', (line) => {
     expect(paintsColour(line)).toBe(false);
   });

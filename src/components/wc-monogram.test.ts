@@ -1,9 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { PASTEL_COUNT } from '../theme/index.js';
+import { MONOGRAM_TONES } from '../theme/index.js';
 import './wc-monogram.js';
 import { WcMonogram, monogramInitials, monogramTone } from './wc-monogram.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
-import { styleText } from '../../preview/controls-suite.js';
+import { styleText } from '../../preview/style-text.js';
 import preview from './wc-monogram.preview.js';
 
 describe('monogramInitials', () => {
@@ -26,12 +26,12 @@ describe('monogramTone', () => {
     for (const seed of ['acme', 'cedar', 'juniper', 'harbor', 'globex', 'initech', '']) {
       const tone = monogramTone(seed);
       expect(tone).toBeGreaterThanOrEqual(1);
-      expect(tone).toBeLessThanOrEqual(PASTEL_COUNT);
+      expect(tone).toBeLessThanOrEqual(MONOGRAM_TONES);
     }
   });
 
   it('gives a seed the same colour every time', () => {
-    expect(monogramTone('/books/acme')).toBe(monogramTone('/books/acme'));
+    expect(monogramTone('/work/acme')).toBe(monogramTone('/work/acme'));
   });
 
   it('spreads the cast across the ramp', () => {
@@ -65,18 +65,18 @@ describe('wc-monogram', () => {
   });
 
   it('takes its colour from the seed, not the name', async () => {
-    const el = await mount({ name: 'Acme Consulting LLC', seed: '/books/acme' });
+    const el = await mount({ name: 'Acme Consulting LLC', seed: '/work/acme' });
     expect(el.shadowRoot?.querySelector('.tile')?.classList).toContain(
-      `tone-${monogramTone('/books/acme')}`,
+      `tone-${monogramTone('/work/acme')}`,
     );
   });
 
   it('draws its text in the on-gradient ink on every pastel', () => {
     const text = styleText(WcMonogram);
-    expect(text).toMatch(/\.tile\s*{[^}]*color:\s*var\(--nc-color-on-gradient\)/);
-    for (let tone = 2; tone <= PASTEL_COUNT; tone += 1) {
+    expect(text).toMatch(/\.tile\s*{[^}]*color:\s*var\(--beam-color-on-tone\)/);
+    for (let tone = 2; tone <= MONOGRAM_TONES; tone += 1) {
       expect(text).toContain(`.tone-${tone}`);
-      expect(text).toContain(`var(--nc-color-pastel-${tone})`);
+      expect(text).toContain(`var(--beam-tone-${tone})`);
     }
   });
 });

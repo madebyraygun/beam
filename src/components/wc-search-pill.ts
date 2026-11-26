@@ -1,18 +1,18 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { controlsCss } from "../theme/index.js";
+import { baseCss } from "../theme/index.js";
 import { dispatchPaletteOpen } from "./wc-breadcrumb.js";
 import "../icons/icons.js";
 
 /**
  * The top bar's search control: a pill that asks for the whole palette
- * (`nc-palette-open` with scope `all`). The keycap shows the shortcut that
+ * (`beam-palette-open` with scope `all`). The keycap shows the shortcut that
  * does the same; which key that is on this platform is the app's to say.
  */
 @customElement("wc-search-pill")
 export class WcSearchPill extends LitElement {
   static styles = [
-    controlsCss,
+    baseCss,
     css`
       :host {
         display: inline-flex;
@@ -22,28 +22,28 @@ export class WcSearchPill extends LitElement {
       button {
         display: inline-flex;
         align-items: center;
-        gap: var(--wa-space-s);
+        gap: var(--beam-space-s);
         width: 240px;
         max-width: 100%;
         height: 32px;
         padding: 0 5px 0 12px;
         box-sizing: border-box;
-        border: 1px solid var(--wa-color-border);
-        border-radius: var(--wa-radius-pill);
-        background: var(--wa-color-surface);
-        color: var(--wa-color-muted);
-        font-family: var(--wa-font-family-sans);
+        border: 1px solid var(--beam-color-border);
+        border-radius: var(--beam-radius-pill);
+        background: var(--beam-color-surface);
+        color: var(--beam-color-muted);
+        font-family: var(--beam-font-family);
         font-size: 12.5px;
         cursor: default;
-        transition: border-color var(--nc-transition-fast);
+        transition: border-color var(--beam-transition-fast);
       }
 
       button:hover {
-        border-color: var(--wa-color-brand);
+        border-color: var(--beam-color-accent);
       }
 
       wc-icon-search {
-        --nc-icon-size: 15px;
+        --beam-icon-size: 15px;
       }
 
       .word {
@@ -53,11 +53,11 @@ export class WcSearchPill extends LitElement {
 
       kbd {
         padding: 0 7px;
-        border: 1px solid var(--wa-color-border);
-        border-radius: var(--wa-radius-pill);
-        background: var(--wa-color-bg);
+        border: 1px solid var(--beam-color-border);
+        border-radius: var(--beam-radius-pill);
+        background: var(--beam-color-bg);
         font-family: inherit;
-        font-size: var(--nc-font-size-caption);
+        font-size: var(--beam-font-size-caption);
         line-height: 18px;
       }
 
@@ -83,6 +83,10 @@ export class WcSearchPill extends LitElement {
     `,
   ];
 
+  /** The visible word and the accessible name. */
+  @property({ type: String })
+  label = "Search";
+
   /** The keycap's text. */
   @property({ type: String })
   shortcut = "⌘K";
@@ -95,14 +99,15 @@ export class WcSearchPill extends LitElement {
     return html`
       <button
         type="button"
-        aria-label="Search"
+        part="button"
+        aria-label=${this.label}
         aria-haspopup="dialog"
         aria-keyshortcuts=${this.keyShortcuts}
         @click=${(event: Event) => dispatchPaletteOpen(event.currentTarget as HTMLElement, "all")}
       >
         <wc-icon-search></wc-icon-search>
-        <span class="word">Search</span>
-        <kbd aria-hidden="true">${this.shortcut}</kbd>
+        <span class="word">${this.label}</span>
+        <kbd part="keycap" aria-hidden="true">${this.shortcut}</kbd>
       </button>
     `;
   }

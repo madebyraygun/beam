@@ -1,6 +1,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { controlsCss } from '../theme/index.js';
+import { baseCss } from '../theme/index.js';
+import { NAVIGATE_EVENT, SIDEBAR_TOGGLE_EVENT, emit } from '../events.js';
 import '../icons/icons.js';
 
 export interface NavItem {
@@ -15,7 +16,7 @@ export interface NavItem {
    * at the top.
    */
   group?: string;
-  /** A figure drawn at the item's right edge — Review's queue. Hidden at 0. */
+  /** A figure drawn at the item's right edge, such as a queue length. Hidden at 0. */
   count?: number;
   /** Drawn in the footer, below every group, rather than in the list. */
   pinned?: boolean;
@@ -42,40 +43,40 @@ function groupsOf(items: NavItem[]): NavGroup[] {
  * Presentational: it renders the items it is given and announces intent.
  * Which items exist, which one is active and whether the panel is folded to
  * its rail are the app's business. The hamburger in its header asks for the
- * other state with `nc-sidebar-toggle`, the same request the shell's own
+ * other state with `beam-sidebar-toggle`, the same request the shell's own
  * toggle makes.
  */
 @customElement('wc-nav-sidebar')
 export class WcNavSidebar extends LitElement {
   static styles = [
-    controlsCss,
+    baseCss,
     css`
       :host {
         display: flex;
         flex-direction: column;
         flex: none;
         box-sizing: border-box;
-        width: var(--nc-sidebar-width);
-        margin: var(--nc-window-inset) 0 var(--nc-window-inset) var(--nc-window-inset);
-        background: var(--nc-color-sidebar-bg);
-        border: 1px solid var(--wa-color-border);
-        border-radius: var(--wa-radius-xl);
-        box-shadow: var(--nc-shadow-floating);
+        width: var(--beam-sidebar-width);
+        margin: var(--beam-window-inset) 0 var(--beam-window-inset) var(--beam-window-inset);
+        background: var(--beam-color-panel);
+        border: 1px solid var(--beam-color-border);
+        border-radius: var(--beam-radius-xl);
+        box-shadow: var(--beam-shadow-floating);
         overflow: hidden;
-        font-family: var(--wa-font-family-sans);
-        transition: width var(--nc-transition-sidebar);
+        font-family: var(--beam-font-family);
+        transition: width var(--beam-transition-sidebar);
       }
 
       :host([collapsed]) {
-        width: var(--nc-sidebar-collapsed-width);
+        width: var(--beam-sidebar-collapsed-width);
       }
 
       .head {
         display: flex;
         align-items: center;
-        gap: var(--wa-space-s);
+        gap: var(--beam-space-s);
         flex: none;
-        height: var(--nc-header-height);
+        height: var(--beam-header-height);
         padding: 0 10px;
         box-sizing: border-box;
       }
@@ -88,22 +89,22 @@ export class WcNavSidebar extends LitElement {
         height: 32px;
         padding: 0;
         border: 0;
-        border-radius: var(--wa-radius-md);
+        border-radius: var(--beam-radius-md);
         background: transparent;
-        color: var(--wa-color-text);
+        color: var(--beam-color-text);
         cursor: default;
-        transition: background var(--nc-transition-fast);
+        transition: background var(--beam-transition-fast);
       }
 
       .hamburger:hover {
-        background: var(--nc-color-hover);
+        background: var(--beam-color-hover);
       }
 
       .wordmark {
         font-size: 15px;
-        font-weight: var(--wa-font-weight-bold);
+        font-weight: var(--beam-font-weight-bold);
         letter-spacing: -0.01em;
-        background: var(--nc-grad-brand-text);
+        background: var(--beam-accent-image);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -126,7 +127,7 @@ export class WcNavSidebar extends LitElement {
         /* 4px of room above the first item for its focus outline, which
            the scroll box would otherwise clip, taken back by the margin. */
         margin-top: -4px;
-        padding: 4px var(--wa-space-s) var(--wa-space-s);
+        padding: 4px var(--beam-space-s) var(--beam-space-s);
         overflow-x: hidden;
         overflow-y: auto;
       }
@@ -134,11 +135,11 @@ export class WcNavSidebar extends LitElement {
       .group-label {
         margin: 0;
         padding: 4px 10px 3px;
-        font-size: var(--nc-font-size-label);
-        font-weight: var(--wa-font-weight-medium);
-        letter-spacing: var(--nc-letter-spacing-label);
+        font-size: var(--beam-font-size-label);
+        font-weight: var(--beam-font-weight-medium);
+        letter-spacing: var(--beam-letter-spacing-label);
         text-transform: uppercase;
-        color: var(--wa-color-muted);
+        color: var(--beam-color-muted);
         white-space: nowrap;
       }
 
@@ -152,8 +153,8 @@ export class WcNavSidebar extends LitElement {
 
       .footer {
         flex: none;
-        padding: var(--wa-space-s);
-        border-top: 1px solid var(--wa-color-border-soft);
+        padding: var(--beam-space-s);
+        border-top: 1px solid var(--beam-color-border-soft);
       }
 
       .item {
@@ -165,30 +166,30 @@ export class WcNavSidebar extends LitElement {
         padding: 0 9px;
         box-sizing: border-box;
         border: 1px solid transparent;
-        border-radius: var(--wa-radius-md);
+        border-radius: var(--beam-radius-md);
         background: transparent;
-        color: var(--wa-color-text);
+        color: var(--beam-color-text);
         font: inherit;
-        font-size: var(--nc-font-size-body);
+        font-size: var(--beam-font-size-body);
         text-align: left;
         white-space: nowrap;
         cursor: default;
-        transition: background var(--nc-transition-fast);
-        --nc-icon-size: 17px;
+        transition: background var(--beam-transition-fast);
+        --beam-icon-size: 17px;
       }
 
       .item:hover:not(.disabled, .active) {
-        background: var(--nc-color-hover);
+        background: var(--beam-color-hover);
       }
 
-      /* The rainbow hairline: the fill painted to the padding edge and the
+      /* The accent hairline: the fill painted to the padding edge and the
          ramp to the border edge, so the transparent 1px border shows the
          ramp and nothing else does. */
       .item.active {
         background:
-          linear-gradient(var(--nc-color-selected-bg), var(--nc-color-selected-bg)) padding-box,
-          var(--nc-grad-brand-text) border-box;
-        font-weight: var(--wa-font-weight-medium);
+          linear-gradient(var(--beam-color-selected), var(--beam-color-selected)) padding-box,
+          var(--beam-accent-image) border-box;
+        font-weight: var(--beam-font-weight-medium);
       }
 
       .item.disabled {
@@ -205,7 +206,7 @@ export class WcNavSidebar extends LitElement {
 
       .count {
         font-size: 11px;
-        color: var(--nc-color-flagged);
+        color: var(--beam-color-warning);
       }
 
       :host([collapsed]) .wordmark,
@@ -232,7 +233,7 @@ export class WcNavSidebar extends LitElement {
          full nav with its words. */
       @media (max-width: 48rem) {
         :host([collapsed]) {
-          width: var(--nc-sidebar-width);
+          width: var(--beam-sidebar-width);
         }
 
         :host([collapsed]) .wordmark,
@@ -249,9 +250,8 @@ export class WcNavSidebar extends LitElement {
       }
 
       /* Screen chrome, not part of the report. This lives here rather than in
-         the theme's print sheet because a rule that hides an element has to
-         be in the tree that element is in, and every wc-* here sits inside
-         the app's shadow root where a document rule cannot reach it. */
+         a document print sheet because a rule that hides an element has to be
+         in the tree that element is in. */
       @media print {
         :host {
           display: none;
@@ -278,23 +278,11 @@ export class WcNavSidebar extends LitElement {
 
   private handleClick(item: NavItem): void {
     if (item.disabled) return;
-    this.dispatchEvent(
-      new CustomEvent<{ id: string }>('nc-navigate', {
-        detail: { id: item.id },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    emit<{ id: string }>(this, NAVIGATE_EVENT, { id: item.id });
   }
 
   private requestToggle(): void {
-    this.dispatchEvent(
-      new CustomEvent<{ collapsed: boolean }>('nc-sidebar-toggle', {
-        detail: { collapsed: !this.collapsed },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    emit<{ collapsed: boolean }>(this, SIDEBAR_TOGGLE_EVENT, { collapsed: !this.collapsed });
   }
 
   private renderIcon(item: NavItem) {
@@ -314,6 +302,7 @@ export class WcNavSidebar extends LitElement {
         <button
           type="button"
           class=${classes}
+          part=${isActive ? 'item active' : 'item'}
           data-nav=${item.id}
           aria-current=${isActive ? 'page' : 'false'}
           aria-disabled=${item.disabled ? 'true' : 'false'}
@@ -332,10 +321,11 @@ export class WcNavSidebar extends LitElement {
     const listed = this.items.filter((item) => !item.pinned);
     const pinned = this.items.filter((item) => item.pinned);
     return html`
-      <div class="head">
+      <div class="head" part="head">
         <button
           type="button"
           class="hamburger"
+          part="toggle"
           aria-label="Sidebar"
           aria-expanded=${this.collapsed ? 'false' : 'true'}
           @click=${this.requestToggle}
@@ -344,7 +334,7 @@ export class WcNavSidebar extends LitElement {
         </button>
         <slot name="mark"></slot>
         ${this.productName
-          ? html`<span class="wordmark" aria-hidden="true">${this.productName}</span>`
+          ? html`<span class="wordmark" part="product-name" aria-hidden="true">${this.productName}</span>`
           : nothing}
       </div>
       <nav aria-label="Primary">
@@ -353,7 +343,7 @@ export class WcNavSidebar extends LitElement {
             (group, index) => html`
               <div class="group">
                 ${group.label
-                  ? html`<p class="group-label" id="group-${index}">${group.label}</p>`
+                  ? html`<p class="group-label" part="group-label" id="group-${index}">${group.label}</p>`
                   : nothing}
                 <ul aria-labelledby=${group.label ? `group-${index}` : nothing}>
                   ${group.items.map((item) => this.renderItem(item))}
@@ -363,7 +353,7 @@ export class WcNavSidebar extends LitElement {
           )}
         </div>
         ${pinned.length
-          ? html`<div class="footer">
+          ? html`<div class="footer" part="footer">
               <ul>
                 ${pinned.map((item) => this.renderItem(item))}
               </ul>
@@ -379,7 +369,7 @@ declare global {
     'wc-nav-sidebar': WcNavSidebar;
   }
   interface HTMLElementEventMap {
-    'nc-navigate': CustomEvent<{ id: string }>;
-    'nc-sidebar-toggle': CustomEvent<{ collapsed: boolean }>;
+    [NAVIGATE_EVENT]: CustomEvent<{ id: string }>;
+    [SIDEBAR_TOGGLE_EVENT]: CustomEvent<{ collapsed: boolean }>;
   }
 }

@@ -3,18 +3,18 @@ import './wc-status-line.js';
 import { WcStatusLine } from './wc-status-line.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
-import { styleText } from '../../preview/controls-suite.js';
+import { styleText } from '../../preview/style-text.js';
 import preview from './wc-status-line.preview.js';
 import { demoSegments, type DemoStatus } from './__mocks__/status.js';
 
-/** Mount the line with a bookkeeping app's segments, built from these values. */
-async function mount(props: DemoStatus & { bookName?: string; bookKey?: string } = {}): Promise<WcStatusLine> {
+/** Mount the line with an example app's segments, built from these values. */
+async function mount(props: DemoStatus & { workspaceName?: string; workspaceKey?: string } = {}): Promise<WcStatusLine> {
   const el = document.createElement('wc-status-line');
-  const { bookName = 'Acme Consulting LLC', bookKey = 'acme', ...status } = props;
-  el.bookName = bookName;
-  el.bookKey = bookKey;
+  const { workspaceName = 'Acme Consulting LLC', workspaceKey = 'acme', ...status } = props;
+  el.workspaceName = workspaceName;
+  el.workspaceKey = workspaceKey;
   el.segments = demoSegments({
-    path: '~/Documents/Nigel/acme-consulting',
+    path: '~/work/acme-consulting',
     version: '1.0',
     reviewCount: 84,
     ...status,
@@ -31,20 +31,20 @@ describe('wc-status-line', () => {
     document.body.innerHTML = '';
   });
 
-  it('starts with the book segment, with no brand block before it', async () => {
+  it('starts with the workspace segment, with no brand block before it', async () => {
     const el = await mount();
     expect(el.shadowRoot?.querySelector('.brand')).toBeNull();
     const first = el.shadowRoot?.querySelector('.segment, .brand');
-    expect(first?.classList.contains('book')).toBe(true);
+    expect(first?.classList.contains('workspace')).toBe(true);
   });
 
-  it('names the book with its monogram and the folder it lives in', async () => {
+  it('names the workspace with its monogram and the folder it lives in', async () => {
     const el = await mount();
-    const book = el.shadowRoot?.querySelector('.book');
-    expect(book?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
-    expect(book?.textContent).toContain('Acme Consulting LLC');
+    const workspace = el.shadowRoot?.querySelector('.workspace');
+    expect(workspace?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
+    expect(workspace?.textContent).toContain('Acme Consulting LLC');
     expect(el.shadowRoot?.querySelector('.path')?.textContent).toBe(
-      '~/Documents/Nigel/acme-consulting',
+      '~/work/acme-consulting',
     );
   });
 
@@ -67,13 +67,13 @@ describe('wc-status-line', () => {
     expect(el.shadowRoot?.querySelector('wc-icon-lock-open')).not.toBeNull();
   });
 
-  it('asks for the palette scoped to books from the book', async () => {
+  it('asks for the palette at the switch scope from the name', async () => {
     const el = await mount();
     const spy = vi.fn();
-    document.body.addEventListener('nc-palette-open', spy);
-    el.shadowRoot?.querySelector<HTMLButtonElement>('.book')?.click();
-    document.body.removeEventListener('nc-palette-open', spy);
-    expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'books' });
+    document.body.addEventListener('beam-palette-open', spy);
+    el.shadowRoot?.querySelector<HTMLButtonElement>('.workspace')?.click();
+    document.body.removeEventListener('beam-palette-open', spy);
+    expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'workspaces' });
   });
 
   it('asks for the whole palette from the hint, spelling the chord it is given', async () => {
@@ -84,9 +84,9 @@ describe('wc-status-line', () => {
     expect(hint?.textContent?.replace(/\s+/g, ' ').trim()).toBe('Ctrl K palette');
     expect(hint?.getAttribute('aria-keyshortcuts')).toBe('Control+K');
     const spy = vi.fn();
-    document.body.addEventListener('nc-palette-open', spy);
+    document.body.addEventListener('beam-palette-open', spy);
     hint?.click();
-    document.body.removeEventListener('nc-palette-open', spy);
+    document.body.removeEventListener('beam-palette-open', spy);
     expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'all' });
   });
 
@@ -95,7 +95,7 @@ describe('wc-status-line', () => {
     const button = el.shadowRoot?.querySelector<HTMLButtonElement>('.review');
     expect(button?.textContent?.replace(/\s+/g, ' ').trim()).toBe('84 to review');
     const spy = vi.fn();
-    el.addEventListener('nc-navigate', spy);
+    el.addEventListener('beam-navigate', spy);
     button?.click();
     expect(spy.mock.calls[0][0].detail).toEqual({ id: 'review' });
     expect(spy.mock.calls[0][0].composed).toBe(true);
@@ -130,17 +130,17 @@ describe('wc-status-line', () => {
 
   it('keeps the full folder in the path tooltip while showing the abbreviated one', async () => {
     const el = await mount({
-      path: '~/Documents/Nigel/acme-consulting',
-      fullPath: '/home/you/Documents/Nigel/acme-consulting',
+      path: '~/work/acme-consulting',
+      fullPath: '/home/you/work/acme-consulting',
     });
     const path = el.shadowRoot?.querySelector('.path');
-    expect(path?.textContent).toBe('~/Documents/Nigel/acme-consulting');
-    expect(path?.getAttribute('title')).toBe('/home/you/Documents/Nigel/acme-consulting');
+    expect(path?.textContent).toBe('~/work/acme-consulting');
+    expect(path?.getAttribute('title')).toBe('/home/you/work/acme-consulting');
   });
 
-  it('draws no book segment before the book has a name', async () => {
-    const el = await mount({ bookName: '' });
-    expect(el.shadowRoot?.querySelector('.book')).toBeNull();
+  it('draws no workspace segment before there is a name', async () => {
+    const el = await mount({ workspaceName: '' });
+    expect(el.shadowRoot?.querySelector('.workspace')).toBeNull();
     expect(el.shadowRoot?.querySelector('.path')).not.toBeNull();
   });
 
@@ -160,10 +160,10 @@ describe('wc-status-line', () => {
     expect(hint).toBeGreaterThan(version);
   });
 
-  it('lets the lock label and the book name shrink with an ellipsis', async () => {
+  it('lets the lock label and the workspace name shrink with an ellipsis', async () => {
     const css = styleText(WcStatusLine);
     expect(css).toMatch(/\.status \.label\s*{[^}]*text-overflow:\s*ellipsis/);
-    expect(css).toMatch(/\.book-name\s*{[^}]*text-overflow:\s*ellipsis/);
+    expect(css).toMatch(/\.workspace-name\s*{[^}]*text-overflow:\s*ellipsis/);
   });
 
   it('shows only the lock icon when narrow, keeping the label for assistive tech and the tooltip', async () => {
@@ -175,17 +175,17 @@ describe('wc-status-line', () => {
     expect(el.shadowRoot?.querySelector('.lock')?.getAttribute('title')).toBe('Encrypted');
   });
 
-  it('fires nc-palette-open from the pressed button so focus can return to it', async () => {
+  it('fires beam-palette-open from the pressed button so focus can return to it', async () => {
     const el = await mount();
     const origins: EventTarget[] = [];
-    document.body.addEventListener('nc-palette-open', (event) => {
+    document.body.addEventListener('beam-palette-open', (event) => {
       origins.push(event.composedPath()[0]);
     });
-    const book = el.shadowRoot?.querySelector<HTMLButtonElement>('.book');
+    const workspace = el.shadowRoot?.querySelector<HTMLButtonElement>('.workspace');
     const hint = el.shadowRoot?.querySelector<HTMLButtonElement>('.hint');
-    book?.click();
+    workspace?.click();
     hint?.click();
-    expect(origins).toEqual([book, hint]);
+    expect(origins).toEqual([workspace, hint]);
   });
 
   it('stands down below the mobile breakpoint', () => {
@@ -202,7 +202,7 @@ describe('wc-status-line, as any app uses it', () => {
 
   async function line(segments: WcStatusLine['segments']): Promise<WcStatusLine> {
     const el = document.createElement('wc-status-line');
-    el.bookName = 'Example board';
+    el.workspaceName = 'Example board';
     el.segments = segments;
     document.body.appendChild(el);
     await el.updateComplete;
@@ -211,7 +211,7 @@ describe('wc-status-line, as any app uses it', () => {
 
   it('draws only the name when the app passes no segments', async () => {
     const el = await line([]);
-    expect([...el.shadowRoot!.querySelectorAll('.segment')].map((s) => s.className)).toEqual(['segment book']);
+    expect([...el.shadowRoot!.querySelectorAll('.segment')].map((s) => s.className)).toEqual(['segment workspace']);
     expect(text(el)).not.toContain('encrypted');
     expect(text(el)).not.toContain('palette');
   });
@@ -223,15 +223,15 @@ describe('wc-status-line, as any app uses it', () => {
       { id: 'who', side: 'end', label: 'writing as ana' },
     ]);
     const order = [...el.shadowRoot!.querySelectorAll('.segment, .spacer')].map((s) => s.className);
-    expect(order).toEqual(['segment book', 'segment count', 'spacer', 'segment sync ok', 'segment who']);
+    expect(order).toEqual(['segment workspace', 'segment count', 'spacer', 'segment sync ok', 'segment who']);
   });
 
-  it('sends nc-status-action with the segment id from an action segment', async () => {
+  it('sends beam-status-action with the segment id from an action segment', async () => {
     const el = await line([{ id: 'sync-now', side: 'end', label: 'Sync now', action: true }]);
     const spy = vi.fn();
-    document.body.addEventListener('nc-status-action', spy);
+    document.body.addEventListener('beam-status-action', spy);
     el.shadowRoot?.querySelector<HTMLButtonElement>('.sync-now')?.click();
-    document.body.removeEventListener('nc-status-action', spy);
+    document.body.removeEventListener('beam-status-action', spy);
     expect(spy.mock.calls[0][0].detail).toEqual({ id: 'sync-now' });
     expect(spy.mock.calls[0][0].composed).toBe(true);
   });
@@ -249,8 +249,8 @@ describe('wc-status-line, as any app uses it', () => {
       { id: 'b', kind: 'status', icon: 'wc-icon-lock', label: 'locked' },
     ]);
     const icons = el.shadowRoot!.querySelectorAll<HTMLElement>('wc-icon-lock');
-    expect(icons[0].style.getPropertyValue('--nc-icon-size')).toBe('12px');
-    expect(icons[1].style.getPropertyValue('--nc-icon-size')).toBe('');
+    expect(icons[0].style.getPropertyValue('--beam-icon-size')).toBe('12px');
+    expect(icons[1].style.getPropertyValue('--beam-icon-size')).toBe('');
   });
 
   it('takes anything else in its start and end slots', async () => {

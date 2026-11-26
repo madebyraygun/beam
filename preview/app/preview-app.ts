@@ -11,10 +11,13 @@ import {
   type ColorMode,
 } from '../../src/theme/index.js';
 
+/** The demo page keeps its own choice, apart from any app on the same origin. */
+export const DEMO_STORAGE_KEY = 'beam-demo.color-mode';
+
 const BG_MAP: Record<PreviewBackground, string> = {
-  default: 'var(--wa-color-bg)',
-  surface: 'var(--wa-color-surface)',
-  inverse: 'var(--nc-color-inverse-bg)',
+  default: 'var(--beam-color-bg)',
+  surface: 'var(--beam-color-surface)',
+  inverse: 'var(--beam-color-inverse-bg)',
   transparent: 'transparent',
 };
 
@@ -24,46 +27,46 @@ export class PreviewApp extends LitElement {
   @state() private route: Route = parseRoute(window.location.href);
   @state() private a11y: A11yResult | null = null;
   @state() private inspectorOpen = false;
-  @state() private colorMode: ColorMode = readMode();
+  @state() private colorMode: ColorMode = readMode(DEMO_STORAGE_KEY);
 
   static styles = css`
     :host {
       display: grid;
       grid-template-columns: 240px 1fr auto;
       height: 100vh;
-      font-family: var(--wa-font-family-sans);
-      color: var(--wa-color-text);
-      background: var(--wa-color-bg);
+      font-family: var(--beam-font-family);
+      color: var(--beam-color-text);
+      background: var(--beam-color-bg);
     }
     nav {
-      border-right: 1px solid var(--wa-color-border);
+      border-right: 1px solid var(--beam-color-border);
       overflow-y: auto;
-      padding: var(--wa-space-l);
+      padding: var(--beam-space-l);
     }
     nav h3 {
-      font-family: var(--wa-font-family-mono);
+      font-family: var(--beam-font-family);
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--wa-color-muted);
-      margin: var(--wa-space-l) 0 var(--wa-space-xs);
+      color: var(--beam-color-muted);
+      margin: var(--beam-space-l) 0 var(--beam-space-xs);
     }
     nav a {
       display: block;
       padding: 6px 8px;
-      border-radius: var(--wa-radius-sm);
-      color: var(--wa-color-text);
+      border-radius: var(--beam-radius-sm);
+      color: var(--beam-color-text);
       text-decoration: none;
       font-size: 13px;
     }
     nav a.active {
-      background: var(--nc-color-selected-bg);
-      font-weight: var(--wa-font-weight-medium);
+      background: var(--beam-color-selected);
+      font-weight: var(--beam-font-weight-medium);
     }
     .modes {
       display: flex;
       gap: 4px;
-      margin-bottom: var(--wa-space-m);
+      margin-bottom: var(--beam-space-m);
     }
     .modes button {
       flex: 1;
@@ -71,28 +74,28 @@ export class PreviewApp extends LitElement {
       font: inherit;
       font-size: 11px;
       text-transform: capitalize;
-      color: var(--wa-color-text);
-      background: var(--wa-color-surface);
-      border: 1px solid var(--wa-color-border);
-      border-radius: var(--wa-radius-sm);
+      color: var(--beam-color-text);
+      background: var(--beam-color-surface);
+      border: 1px solid var(--beam-color-border);
+      border-radius: var(--beam-radius-sm);
       cursor: pointer;
     }
     .modes button[aria-pressed='true'] {
-      background: var(--nc-color-selected-bg);
-      font-weight: var(--wa-font-weight-medium);
+      background: var(--beam-color-selected);
+      font-weight: var(--beam-font-weight-medium);
     }
     main {
-      padding: var(--wa-space-xl);
+      padding: var(--beam-space-xl);
       overflow-y: auto;
     }
     h1 {
-      font-size: var(--wa-font-size-xl);
-      margin: 0 0 var(--wa-space-s);
+      font-size: var(--beam-font-size-display);
+      margin: 0 0 var(--beam-space-s);
     }
     .state-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: var(--wa-space-l);
+      gap: var(--beam-space-l);
     }
     .state-grid[data-layout='grid-wide'] {
       grid-template-columns: repeat(auto-fit, minmax(540px, 1fr));
@@ -101,47 +104,47 @@ export class PreviewApp extends LitElement {
       grid-template-columns: 1fr;
     }
     .state-card {
-      border: 1px solid var(--wa-color-border);
-      border-radius: var(--wa-radius-md);
-      padding: var(--wa-space-l);
+      border: 1px solid var(--beam-color-border);
+      border-radius: var(--beam-radius-md);
+      padding: var(--beam-space-l);
     }
     .state-card[data-bg='inverse'] {
-      color: var(--nc-color-inverse-text);
+      color: var(--beam-color-inverse-text);
     }
     .state-name {
-      font-family: var(--wa-font-family-mono);
+      font-family: var(--beam-font-family);
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--wa-color-muted);
-      margin-bottom: var(--wa-space-s);
+      color: var(--beam-color-muted);
+      margin-bottom: var(--beam-space-s);
     }
     aside {
       width: 320px;
-      border-left: 1px solid var(--wa-color-border);
-      padding: var(--wa-space-l);
+      border-left: 1px solid var(--beam-color-border);
+      padding: var(--beam-space-l);
       overflow-y: auto;
-      background: var(--wa-color-surface);
+      background: var(--beam-color-surface);
     }
     aside[hidden] {
       display: none;
     }
     .violation {
-      padding: var(--wa-space-s);
-      border-left: 3px solid var(--wa-color-danger);
-      margin-bottom: var(--wa-space-s);
+      padding: var(--beam-space-s);
+      border-left: 3px solid var(--beam-color-danger);
+      margin-bottom: var(--beam-space-s);
     }
     button.inspector-toggle {
       position: fixed;
       top: 12px;
       right: 12px;
-      background: var(--wa-color-surface);
-      color: var(--wa-color-text);
-      border: 1px solid var(--wa-color-border);
+      background: var(--beam-color-surface);
+      color: var(--beam-color-text);
+      border: 1px solid var(--beam-color-border);
       padding: 6px 10px;
-      border-radius: var(--wa-radius-sm);
+      border-radius: var(--beam-radius-sm);
       cursor: pointer;
-      font-family: var(--wa-font-family-mono);
+      font-family: var(--beam-font-family);
       font-size: 12px;
     }
   `;
@@ -197,7 +200,7 @@ export class PreviewApp extends LitElement {
    */
   private setColorMode(mode: ColorMode): void {
     this.colorMode = mode;
-    writeMode(mode);
+    writeMode(DEMO_STORAGE_KEY, mode);
     applyMode(mode);
   }
 

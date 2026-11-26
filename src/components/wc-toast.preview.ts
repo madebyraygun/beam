@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import './wc-toast.js';
 import type { Preview } from '../../preview/types.js';
-import type { NcToastDetail } from './wc-toast.js';
+import type { ToastDetail } from './wc-toast.js';
 
 /**
  * Long enough to hold still while a state is being looked at, and short of
@@ -9,7 +9,7 @@ import type { NcToastDetail } from './wc-toast.js';
  */
 const PREVIEW_DURATION_MS = 10 * 60 * 1000;
 
-const seeded = (initial: NcToastDetail | NcToastDetail[]) => {
+const seeded = (initial: ToastDetail | ToastDetail[]) => {
   const held = (Array.isArray(initial) ? initial : [initial]).map((detail) => ({
     duration: PREVIEW_DURATION_MS,
     ...detail,
@@ -22,12 +22,12 @@ const preview: Preview = {
   title: 'Toast',
   group: 'Feedback',
   description:
-    'The polite live region terminating the nc-toast bus. It pins to the bottom-right corner of the viewport, clear of the sidebar and header, and stacks up to three toasts; a danger toast is its own alert. States seed toasts via .initial with a long duration so they stay visible — except never-expires, which is the duration-zero case and carries a close button.',
+    'The polite live region terminating the beam-toast bus. It pins to the bottom-right corner of the viewport, clear of the sidebar and header, and stacks up to three toasts; a danger toast is its own alert. States seed toasts via .initial with a long duration so they stay visible — except never-expires, which is the duration-zero case and carries a close button.',
   layout: 'stack',
   states: [
     {
       name: 'info',
-      render: () => seeded({ message: 'Rules re-applied.' } satisfies NcToastDetail),
+      render: () => seeded({ message: 'Rules re-applied.' } satisfies ToastDetail),
     },
     {
       name: 'success',
@@ -35,15 +35,15 @@ const preview: Preview = {
         seeded({
           message: '42 transactions imported.',
           variant: 'success',
-        } satisfies NcToastDetail),
+        } satisfies ToastDetail),
     },
     {
       name: 'danger',
       render: () =>
         seeded({
-          message: 'Could not reach the nigel server.',
+          message: 'Could not reach the server.',
           variant: 'danger',
-        } satisfies NcToastDetail),
+        } satisfies ToastDetail),
     },
     {
       name: 'with-action',
@@ -51,7 +51,7 @@ const preview: Preview = {
         seeded({
           message: 'Import undone.',
           action: { label: 'Redo', onClick: () => {} },
-        } satisfies NcToastDetail),
+        } satisfies ToastDetail),
     },
     {
       name: 'long-message',
@@ -60,16 +60,16 @@ const preview: Preview = {
           message:
             'The category "Office Supplies" could not be deleted because 37 transactions still reference it, and every one of them would be left without a category.',
           variant: 'danger',
-        } satisfies NcToastDetail),
+        } satisfies ToastDetail),
     },
     {
       name: 'never-expires',
       render: () =>
         seeded({
-          message: 'Could not reach the nigel server.',
+          message: 'Could not reach the server.',
           variant: 'danger',
           duration: 0,
-        } satisfies NcToastDetail),
+        } satisfies ToastDetail),
     },
     {
       name: 'stacked',
@@ -81,7 +81,7 @@ const preview: Preview = {
             message: 'Import undone.',
             action: { label: 'Redo', onClick: () => {} },
           },
-        ] satisfies NcToastDetail[]),
+        ] satisfies ToastDetail[]),
     },
   ],
 };

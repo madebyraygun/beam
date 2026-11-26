@@ -1,9 +1,9 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import './wc-toast.js';
-import { dispatchNcToast, MAX_VISIBLE_TOASTS, WcToast } from './wc-toast.js';
+import { dispatchToast, MAX_VISIBLE_TOASTS, WcToast } from './wc-toast.js';
 import { describePrintHiding } from '../../preview/print-suite.js';
 import { describePreviewA11y } from '../../preview/axe-suite.js';
-import { styleText } from '../../preview/controls-suite.js';
+import { styleText } from '../../preview/style-text.js';
 import {
   customProperties,
   fixedBox,
@@ -12,7 +12,7 @@ import {
   resolvedDeclarations,
   type Viewport,
 } from '../../preview/css-geometry.js';
-import { nigelTheme } from '../theme/index.js';
+import { defaultTheme } from '../theme/index.js';
 import preview from './wc-toast.preview.js';
 
 async function mount(): Promise<WcToast> {
@@ -57,7 +57,7 @@ describe('wc-toast', () => {
     const stranger = document.createElement('div');
     document.body.appendChild(stranger);
 
-    dispatchNcToast(stranger, { message: 'Saved.' });
+    dispatchToast(stranger, { message: 'Saved.' });
     await el.updateComplete;
 
     expect(toastEl(el)?.textContent).toContain('Saved.');
@@ -65,7 +65,7 @@ describe('wc-toast', () => {
 
   it('announces politely for info and success', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Done.', variant: 'success' });
+    dispatchToast(el, { message: 'Done.', variant: 'success' });
     await el.updateComplete;
     expect(region(el)?.getAttribute('role')).toBe('status');
     expect(region(el)?.getAttribute('aria-live')).toBe('polite');
@@ -74,7 +74,7 @@ describe('wc-toast', () => {
 
   it('announces assertively for danger without escalating the region', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Failed.', variant: 'danger' });
+    dispatchToast(el, { message: 'Failed.', variant: 'danger' });
     await el.updateComplete;
     // The alert is the toast itself, so a later info toast in the same region
     // is not dragged up to assertive with it.
@@ -85,7 +85,7 @@ describe('wc-toast', () => {
 
   it('re-announces only what changed', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'First.', duration: 0 });
+    dispatchToast(el, { message: 'First.', duration: 0 });
     await el.updateComplete;
     // aria-atomic would make every arrival re-read the whole column.
     expect(region(el)?.hasAttribute('aria-atomic')).toBe(false);
@@ -94,7 +94,7 @@ describe('wc-toast', () => {
   it('auto-dismisses after the default duration', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Transient.' });
+    dispatchToast(el, { message: 'Transient.' });
     await el.updateComplete;
     expect(toastEl(el)).toBeTruthy();
 
@@ -106,7 +106,7 @@ describe('wc-toast', () => {
   it('gives an actionable toast longer to be read', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Undone.', action: { label: 'Redo', onClick: () => {} } });
+    dispatchToast(el, { message: 'Undone.', action: { label: 'Redo', onClick: () => {} } });
     await el.updateComplete;
 
     vi.advanceTimersByTime(4000);
@@ -121,7 +121,7 @@ describe('wc-toast', () => {
   it('stays put when the duration is zero', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Sticky.', duration: 0 });
+    dispatchToast(el, { message: 'Sticky.', duration: 0 });
     await el.updateComplete;
 
     vi.advanceTimersByTime(60_000);
@@ -132,7 +132,7 @@ describe('wc-toast', () => {
   it('invokes the action and dismisses on click', async () => {
     const onClick = vi.fn();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Undone.', action: { label: 'Redo', onClick } });
+    dispatchToast(el, { message: 'Undone.', action: { label: 'Redo', onClick } });
     await el.updateComplete;
 
     el.shadowRoot?.querySelector<HTMLButtonElement>('[data-toast-action]')?.click();
@@ -145,7 +145,7 @@ describe('wc-toast', () => {
   it('survives an action that throws', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const el = await mount();
-    dispatchNcToast(el, {
+    dispatchToast(el, {
       message: 'Boom.',
       action: {
         label: 'Explode',
@@ -167,7 +167,7 @@ describe('wc-toast', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const el = await mount();
     el.dispatchEvent(
-      new CustomEvent('nc-toast', { detail: { message: '' }, bubbles: true, composed: true }),
+      new CustomEvent('beam-toast', { detail: { message: '' }, bubbles: true, composed: true }),
     );
     await el.updateComplete;
     expect(toastEl(el)).toBeNull();
@@ -176,7 +176,7 @@ describe('wc-toast', () => {
   it('stops listening once disconnected', async () => {
     const el = await mount();
     el.remove();
-    dispatchNcToast(document.body, { message: 'Too late.' });
+    dispatchToast(document.body, { message: 'Too late.' });
     await el.updateComplete;
     expect(toastEl(el)).toBeNull();
   });
@@ -215,7 +215,7 @@ describe('wc-toast dismissal', () => {
   it('gives a toast that never expires a close button', async () => {
     const el = await mount();
     // the app's status error is exactly this shape: sticky, no action.
-    dispatchNcToast(el, { message: 'Could not reach the server.', duration: 0 });
+    dispatchToast(el, { message: 'Could not reach the server.', duration: 0 });
     await el.updateComplete;
 
     const close = closeButton(el);
@@ -229,14 +229,14 @@ describe('wc-toast dismissal', () => {
 
   it('leaves the close button off a toast that expires on its own', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Saved.' });
+    dispatchToast(el, { message: 'Saved.' });
     await el.updateComplete;
     expect(closeButton(el)).toBeNull();
   });
 
   it('leaves the close button off a sticky toast whose action ends it', async () => {
     const el = await mount();
-    dispatchNcToast(el, {
+    dispatchToast(el, {
       message: 'Import undone.',
       duration: 0,
       action: { label: 'Redo', onClick: () => {} },
@@ -247,8 +247,8 @@ describe('wc-toast dismissal', () => {
 
   it('closes only the toast whose button was clicked', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Stays.', duration: 0 });
-    dispatchNcToast(el, { message: 'Goes.', duration: 0 });
+    dispatchToast(el, { message: 'Stays.', duration: 0 });
+    dispatchToast(el, { message: 'Goes.', duration: 0 });
     await el.updateComplete;
 
     el.shadowRoot?.querySelectorAll<HTMLButtonElement>('[data-toast-close]')[1]?.click();
@@ -316,16 +316,16 @@ describe('wc-toast top-layer promotion', () => {
     const el = await mount();
     expect(calls).toEqual([]);
 
-    dispatchNcToast(el, { message: 'First.', duration: 0 });
+    dispatchToast(el, { message: 'First.', duration: 0 });
     await el.updateComplete;
     expect(calls).toEqual(['show']);
   });
 
   it('re-promotes above anything opened since the last toast', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'First.', duration: 0 });
+    dispatchToast(el, { message: 'First.', duration: 0 });
     await el.updateComplete;
-    dispatchNcToast(el, { message: 'Second.', duration: 0 });
+    dispatchToast(el, { message: 'Second.', duration: 0 });
     await el.updateComplete;
     expect(calls).toEqual(['show', 'hide', 'show']);
   });
@@ -333,9 +333,9 @@ describe('wc-toast top-layer promotion', () => {
   it('leaves the region alone when a toast expires with others behind it', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Sticks.', duration: 0 });
+    dispatchToast(el, { message: 'Sticks.', duration: 0 });
     await el.updateComplete;
-    dispatchNcToast(el, { message: 'Brief.', duration: 1000 });
+    dispatchToast(el, { message: 'Brief.', duration: 1000 });
     await el.updateComplete;
     calls = [];
 
@@ -350,14 +350,14 @@ describe('wc-toast top-layer promotion', () => {
   it('re-promotes a shrunken stack as soon as a new toast arrives', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Sticks.', duration: 0 });
-    dispatchNcToast(el, { message: 'Brief.', duration: 1000 });
+    dispatchToast(el, { message: 'Sticks.', duration: 0 });
+    dispatchToast(el, { message: 'Brief.', duration: 1000 });
     await el.updateComplete;
     vi.advanceTimersByTime(1000);
     await el.updateComplete;
     calls = [];
 
-    dispatchNcToast(el, { message: 'Newest.', duration: 0 });
+    dispatchToast(el, { message: 'Newest.', duration: 0 });
     await el.updateComplete;
     expect(calls).toEqual(['hide', 'show']);
   });
@@ -365,7 +365,7 @@ describe('wc-toast top-layer promotion', () => {
   it('withdraws the region once the last toast goes', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Brief.', duration: 1000 });
+    dispatchToast(el, { message: 'Brief.', duration: 1000 });
     await el.updateComplete;
     calls = [];
 
@@ -383,8 +383,8 @@ describe('wc-toast stacking', () => {
 
   it('keeps earlier toasts visible, newest last', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Older.', duration: 0 });
-    dispatchNcToast(el, { message: 'Newer.', duration: 0 });
+    dispatchToast(el, { message: 'Older.', duration: 0 });
+    dispatchToast(el, { message: 'Newer.', duration: 0 });
     await el.updateComplete;
     expect(messages(el)).toEqual(['Older.', 'Newer.']);
   });
@@ -392,7 +392,7 @@ describe('wc-toast stacking', () => {
   it('drops the oldest past the visible limit', async () => {
     const el = await mount();
     for (let n = 1; n <= MAX_VISIBLE_TOASTS + 2; n += 1) {
-      dispatchNcToast(el, { message: `Toast ${n}.`, duration: 0 });
+      dispatchToast(el, { message: `Toast ${n}.`, duration: 0 });
     }
     await el.updateComplete;
     expect(messages(el)).toEqual(['Toast 3.', 'Toast 4.', 'Toast 5.']);
@@ -401,8 +401,8 @@ describe('wc-toast stacking', () => {
   it('dismisses each toast on its own timer', async () => {
     vi.useFakeTimers();
     const el = await mount();
-    dispatchNcToast(el, { message: 'Short.', duration: 1000 });
-    dispatchNcToast(el, { message: 'Long.', duration: 5000 });
+    dispatchToast(el, { message: 'Short.', duration: 1000 });
+    dispatchToast(el, { message: 'Long.', duration: 5000 });
     await el.updateComplete;
 
     vi.advanceTimersByTime(1000);
@@ -416,8 +416,8 @@ describe('wc-toast stacking', () => {
 
   it('leaves the other toasts alone when one action fires', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'Stays.', duration: 0 });
-    dispatchNcToast(el, {
+    dispatchToast(el, { message: 'Stays.', duration: 0 });
+    dispatchToast(el, {
       message: 'Goes.',
       duration: 0,
       action: { label: 'Redo', onClick: () => {} },
@@ -432,8 +432,8 @@ describe('wc-toast stacking', () => {
 
   it('dismiss() clears the whole stack', async () => {
     const el = await mount();
-    dispatchNcToast(el, { message: 'One.', duration: 0 });
-    dispatchNcToast(el, { message: 'Two.', duration: 0 });
+    dispatchToast(el, { message: 'One.', duration: 0 });
+    dispatchToast(el, { message: 'Two.', duration: 0 });
     await el.updateComplete;
 
     el.dismiss();
@@ -454,7 +454,7 @@ describe('wc-toast placement', () => {
   // The theme's tokens are in scope wherever the component renders; the
   // component's own :host knobs sit on top of them.
   const vars = {
-    ...customProperties(nigelTheme.cssText, ':root'),
+    ...customProperties(defaultTheme.cssText, ':root'),
     ...customProperties(css, ':host'),
   };
   const regionRules = resolvedDeclarations(css, '.region');

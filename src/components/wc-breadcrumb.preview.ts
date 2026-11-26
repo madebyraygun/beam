@@ -7,14 +7,14 @@ const preview: Preview = {
   title: 'Breadcrumb',
   group: 'Layout',
   description:
-    'Where the user is: the open book (monogram, name, chevron — opens the palette), then the screen, then any level below it.',
+    'Where the user is: the open workspace (monogram, name, chevron — opens the palette), then the screen, then any level below it.',
   states: [
     {
       name: 'screen',
       render: () =>
         html`<wc-breadcrumb
-          book-name="Acme Consulting LLC"
-          book-key="acme"
+          workspace-name="Acme Consulting LLC"
+          workspace-key="acme"
           .trail=${[{ label: 'Dashboard' }]}
         ></wc-breadcrumb>`,
     },
@@ -22,17 +22,17 @@ const preview: Preview = {
       name: 'invoice detail',
       render: () =>
         html`<wc-breadcrumb
-          book-name="Acme Consulting LLC"
-          book-key="acme"
+          workspace-name="Acme Consulting LLC"
+          workspace-key="acme"
           .trail=${[{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }]}
         ></wc-breadcrumb>`,
     },
     {
-      name: 'another book',
+      name: 'another workspace',
       render: () =>
         html`<wc-breadcrumb
-          book-name="Juniper Labs"
-          book-key="juniper"
+          workspace-name="Juniper Labs"
+          workspace-key="juniper"
           .trail=${[{ label: 'Register' }]}
         ></wc-breadcrumb>`,
     },
@@ -41,8 +41,8 @@ const preview: Preview = {
       render: () =>
         html`<div style="width:260px;">
           <wc-breadcrumb
-            book-name="Harbor & Vale Architecture and Interiors Partnership"
-            book-key="harbor"
+            workspace-name="Harbor & Vale Architecture and Interiors Partnership"
+            workspace-key="harbor"
             .trail=${[{ label: 'Reconcile' }]}
           ></wc-breadcrumb>
         </div>`,

@@ -21,9 +21,9 @@ describe('wc-search-pill', () => {
   it('asks for the whole palette', async () => {
     const el = await mount();
     const spy = vi.fn();
-    document.body.addEventListener('nc-palette-open', spy);
+    document.body.addEventListener('beam-palette-open', spy);
     el.shadowRoot?.querySelector('button')?.click();
-    document.body.removeEventListener('nc-palette-open', spy);
+    document.body.removeEventListener('beam-palette-open', spy);
     expect(spy).toHaveBeenCalledOnce();
     expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'all' });
   });

@@ -1,7 +1,8 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { controlsCss } from '../theme/index.js';
+import { baseCss } from '../theme/index.js';
+import { NAVIGATE_EVENT, STATUS_ACTION_EVENT, emit } from '../events.js';
 import { dispatchPaletteOpen, type PaletteScope } from './wc-breadcrumb.js';
 import './wc-monogram.js';
 import '../icons/icons.js';
@@ -14,7 +15,7 @@ import '../icons/icons.js';
 export interface StatusSegment {
   /**
    * Names the segment. It becomes a class on the element, so an app's tests
-   * can find it, and it is the `id` in `nc-status-action`.
+   * can find it, and it is the `id` in `beam-status-action`.
    */
   id: string;
   label: string;
@@ -40,27 +41,27 @@ export interface StatusSegment {
    */
   kind?: 'plain' | 'text' | 'status';
   /** A colour for the whole segment. */
-  tone?: 'flagged' | 'danger' | 'ok';
+  tone?: 'warning' | 'danger' | 'ok';
   /**
    * When the line runs out of room: `first` goes below 760px, `second` below
    * 620px. Absent: the segment stays.
    */
   drops?: 'first' | 'second';
-  /** Makes the segment a button that asks to go to this screen (`nc-navigate`). */
+  /** Makes the segment a button that asks to go to this screen (`beam-navigate`). */
   navigate?: string;
-  /** Makes the segment a button that asks for the palette (`nc-palette-open`). */
+  /** Makes the segment a button that asks for the palette (`beam-palette-open`). */
   palette?: PaletteScope;
-  /** Makes the segment a button that sends `nc-status-action` with its `id`. */
+  /** Makes the segment a button that sends `beam-status-action` with its `id`. */
   action?: boolean;
 }
 
 /**
- * The floating status line under the content: the open book's name, then
+ * The floating status line under the content: the workspace name, then
  * whatever segments the app passes, on either side of a spacer.
  *
  * Presentational, like the rest of the shell. The name opens the palette
- * scoped to books (`nc-palette-open`). A segment can ask to go to a screen
- * (`nc-navigate`), ask for the palette, or send `nc-status-action` with its
+ * at `switch-scope` (`beam-palette-open`). A segment can ask to go to a screen
+ * (`beam-navigate`), ask for the palette, or send `beam-status-action` with its
  * id; otherwise it is text. The slots `start` and `end` take anything else an
  * app wants on the line. The line is a desktop furnishing and stands down
  * below the mobile breakpoint.
@@ -68,23 +69,23 @@ export interface StatusSegment {
 @customElement('wc-status-line')
 export class WcStatusLine extends LitElement {
   static styles = [
-    controlsCss,
+    baseCss,
     css`
       :host {
         display: flex;
         align-items: stretch;
         flex: none;
         height: 34px;
-        margin: 0 var(--nc-window-inset) var(--nc-window-inset);
+        margin: 0 var(--beam-window-inset) var(--beam-window-inset);
         box-sizing: border-box;
-        background: var(--nc-color-sidebar-bg);
-        border: 1px solid var(--wa-color-border);
-        border-radius: var(--wa-radius-lg);
-        box-shadow: var(--nc-shadow-floating);
+        background: var(--beam-color-panel);
+        border: 1px solid var(--beam-color-border);
+        border-radius: var(--beam-radius-lg);
+        box-shadow: var(--beam-shadow-floating);
         overflow: hidden;
-        color: var(--wa-color-muted);
-        font-family: var(--wa-font-family-sans);
-        font-size: var(--nc-font-size-caption);
+        color: var(--beam-color-muted);
+        font-family: var(--beam-font-family);
+        font-size: var(--beam-font-size-caption);
         white-space: nowrap;
         container-type: inline-size;
       }
@@ -96,7 +97,7 @@ export class WcStatusLine extends LitElement {
         flex: none;
         padding: 0 12px;
         border: 0;
-        border-right: 1px solid var(--wa-color-border-soft);
+        border-right: 1px solid var(--beam-color-border-soft);
         background: transparent;
         color: inherit;
         font: inherit;
@@ -105,7 +106,7 @@ export class WcStatusLine extends LitElement {
 
       button.segment:focus-visible {
         outline-offset: -2px;
-        border-radius: var(--wa-radius-sm);
+        border-radius: var(--beam-radius-sm);
       }
 
       .spacer {
@@ -115,36 +116,36 @@ export class WcStatusLine extends LitElement {
 
       .spacer ~ .segment {
         border-right: 0;
-        border-left: 1px solid var(--wa-color-border-soft);
+        border-left: 1px solid var(--beam-color-border-soft);
       }
 
       button.segment {
-        transition: background var(--nc-transition-fast);
+        transition: background var(--beam-transition-fast);
       }
 
       button.segment:hover {
-        background: var(--nc-color-hover);
+        background: var(--beam-color-hover);
       }
 
-      /* Short of room the book's name gives way first, then a text segment;
-         the monogram still says which book it is. */
-      .book {
+      /* Short of room the workspace name gives way first, then a text
+         segment; the monogram still says which one it is. */
+      .workspace {
         flex: 0 8 auto;
         min-width: 0;
-        color: var(--wa-color-text);
+        color: var(--beam-color-text);
       }
 
-      .book wc-monogram {
-        --nc-monogram-size: 14px;
+      .workspace wc-monogram {
+        --beam-monogram-size: 14px;
       }
 
-      .book wc-monogram::part(tile) {
-        border-radius: var(--wa-radius-xs);
+      .workspace wc-monogram::part(tile) {
+        border-radius: var(--beam-radius-xs);
         font-size: 7px;
-        font-weight: var(--wa-font-weight-semibold);
+        font-weight: var(--beam-font-weight-semibold);
       }
 
-      .book-name {
+      .workspace-name {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 32ch;
@@ -161,7 +162,7 @@ export class WcStatusLine extends LitElement {
         cursor: text;
       }
 
-      /* A status segment's label gives way after the book's name and before a
+      /* A status segment's label gives way after the workspace name and before a
          text segment. */
       .status {
         position: relative;
@@ -174,16 +175,16 @@ export class WcStatusLine extends LitElement {
         text-overflow: ellipsis;
       }
 
-      .flagged {
-        color: var(--nc-color-flagged);
+      .warning {
+        color: var(--beam-color-warning);
       }
 
       .danger {
-        color: var(--wa-color-danger);
+        color: var(--beam-color-danger);
       }
 
       .ok {
-        color: var(--wa-color-success);
+        color: var(--beam-color-success);
       }
 
       ::slotted(*) {
@@ -238,13 +239,21 @@ export class WcStatusLine extends LitElement {
     `,
   ];
 
-  /** The open book's name. */
-  @property({ type: String, attribute: 'book-name' })
-  bookName = '';
+  /** The name of what is open. Empty draws no name. */
+  @property({ type: String, attribute: 'workspace-name' })
+  workspaceName = '';
 
-  /** What picks the monogram's colour: something that names the book for good. */
-  @property({ type: String, attribute: 'book-key' })
-  bookKey = '';
+  /** What picks the monogram's colour: something that names it for good. */
+  @property({ type: String, attribute: 'workspace-key' })
+  workspaceKey = '';
+
+  /** The tooltip on the name. */
+  @property({ type: String, attribute: 'switch-label' })
+  switchLabel = 'Switch workspace';
+
+  /** The palette scope the name asks for. */
+  @property({ type: String, attribute: 'switch-scope' })
+  switchScope: PaletteScope = 'workspaces';
 
   /** What the line holds besides the name, in order. */
   @property({ attribute: false })
@@ -254,28 +263,16 @@ export class WcStatusLine extends LitElement {
     if (segment.palette) {
       dispatchPaletteOpen(from as HTMLElement, segment.palette);
     } else if (segment.navigate) {
-      this.dispatchEvent(
-        new CustomEvent<{ id: string }>('nc-navigate', {
-          detail: { id: segment.navigate },
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      emit<{ id: string }>(this, NAVIGATE_EVENT, { id: segment.navigate });
     } else {
-      this.dispatchEvent(
-        new CustomEvent<{ id: string }>('nc-status-action', {
-          detail: { id: segment.id },
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      emit<{ id: string }>(this, STATUS_ACTION_EVENT, { id: segment.id });
     }
   }
 
   private iconOf(segment: StatusSegment) {
     if (!segment.icon) return nothing;
     const icon = document.createElement(segment.icon);
-    if (segment.iconSize) icon.style.setProperty('--nc-icon-size', `${segment.iconSize}px`);
+    if (segment.iconSize) icon.style.setProperty('--beam-icon-size', `${segment.iconSize}px`);
     return icon;
   }
 
@@ -298,6 +295,7 @@ export class WcStatusLine extends LitElement {
       return html`<button
         type="button"
         class=${classes}
+        part="segment"
         title=${ifDefined(segment.title)}
         aria-haspopup=${ifDefined(segment.palette ? 'dialog' : undefined)}
         aria-keyshortcuts=${ifDefined(segment.keyShortcuts)}
@@ -306,7 +304,7 @@ export class WcStatusLine extends LitElement {
         ${body}
       </button>`;
     }
-    return html`<span class=${classes} title=${ifDefined(segment.title)}>${body}</span>`;
+    return html`<span class=${classes} part="segment" title=${ifDefined(segment.title)}>${body}</span>`;
   }
 
   render() {
@@ -314,16 +312,17 @@ export class WcStatusLine extends LitElement {
     const end = this.segments.filter((segment) => segment.side === 'end');
     return html`
       ${
-        this.bookName
+        this.workspaceName
           ? html`<button
               type="button"
-              class="segment book"
+              class="segment workspace"
+              part="workspace"
               aria-haspopup="dialog"
-              title="Switch books"
-              @click=${(e: Event) => dispatchPaletteOpen(e.currentTarget!, 'books')}
+              title=${this.switchLabel}
+              @click=${(e: Event) => dispatchPaletteOpen(e.currentTarget!, this.switchScope)}
             >
-              <wc-monogram name=${this.bookName} seed=${this.bookKey}></wc-monogram>
-              <span class="book-name">${this.bookName}</span>
+              <wc-monogram name=${this.workspaceName} seed=${this.workspaceKey}></wc-monogram>
+              <span class="workspace-name">${this.workspaceName}</span>
             </button>`
           : nothing
       }
@@ -341,6 +340,6 @@ declare global {
     'wc-status-line': WcStatusLine;
   }
   interface HTMLElementEventMap {
-    'nc-status-action': CustomEvent<{ id: string }>;
+    [STATUS_ACTION_EVENT]: CustomEvent<{ id: string }>;
   }
 }

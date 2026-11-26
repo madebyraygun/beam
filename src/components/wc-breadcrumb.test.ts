@@ -7,7 +7,7 @@ import preview from './wc-breadcrumb.preview.js';
 
 async function mount(props: Partial<WcBreadcrumb> = {}): Promise<WcBreadcrumb> {
   const el = document.createElement('wc-breadcrumb');
-  Object.assign(el, { bookName: 'Acme Consulting LLC', bookKey: 'acme' }, props);
+  Object.assign(el, { workspaceName: 'Acme Consulting LLC', workspaceKey: 'acme' }, props);
   document.body.appendChild(el);
   await el.updateComplete;
   return el;
@@ -23,22 +23,22 @@ describe('wc-breadcrumb', () => {
     expect(el.shadowRoot?.querySelector('nav')?.getAttribute('aria-label')).toBe('Breadcrumb');
   });
 
-  it('leads with the book: its monogram and its name', async () => {
+  it('leads with the workspace: its monogram and its name', async () => {
     const el = await mount({ trail: [{ label: 'Dashboard' }] });
-    const book = el.shadowRoot?.querySelector('.book');
-    expect(book?.querySelector('wc-monogram')?.getAttribute('name')).toBe('Acme Consulting LLC');
-    expect(book?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
-    expect(book?.querySelector('.book-name')?.textContent).toBe('Acme Consulting LLC');
+    const workspace = el.shadowRoot?.querySelector('.workspace');
+    expect(workspace?.querySelector('wc-monogram')?.getAttribute('name')).toBe('Acme Consulting LLC');
+    expect(workspace?.querySelector('wc-monogram')?.getAttribute('seed')).toBe('acme');
+    expect(workspace?.querySelector('.workspace-name')?.textContent).toBe('Acme Consulting LLC');
   });
 
-  it('asks for the palette scoped to books when the book is pressed', async () => {
+  it('asks for the palette at the switch scope when the name is pressed', async () => {
     const el = await mount({ trail: [{ label: 'Dashboard' }] });
     const spy = vi.fn();
-    document.body.addEventListener('nc-palette-open', spy);
-    el.shadowRoot?.querySelector<HTMLButtonElement>('.book')?.click();
-    document.body.removeEventListener('nc-palette-open', spy);
+    document.body.addEventListener('beam-palette-open', spy);
+    el.shadowRoot?.querySelector<HTMLButtonElement>('.workspace')?.click();
+    document.body.removeEventListener('beam-palette-open', spy);
     expect(spy).toHaveBeenCalledOnce();
-    expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'books' });
+    expect(spy.mock.calls[0][0].detail).toEqual({ scope: 'workspaces' });
   });
 
   it('marks the last level as the current page and does not make it a button', async () => {
@@ -53,7 +53,7 @@ describe('wc-breadcrumb', () => {
       trail: [{ label: 'Invoices', id: 'invoices' }, { label: '#1254' }],
     });
     const spy = vi.fn();
-    el.addEventListener('nc-navigate', spy);
+    el.addEventListener('beam-navigate', spy);
     el.shadowRoot?.querySelector<HTMLButtonElement>('[data-level="invoices"]')?.click();
     expect(spy.mock.calls[0][0].detail).toEqual({ id: 'invoices' });
     expect(spy.mock.calls[0][0].composed).toBe(true);

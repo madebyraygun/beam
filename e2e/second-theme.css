@@ -1,0 +1,13 @@
+/* A theme that differs from the default in accent, surfaces and font, applied
+   when <html> has the class second-theme. */
+:root.second-theme {
+  --beam-color-accent: #c2185b;
+  --beam-color-focus: #c2185b;
+  --beam-accent-image: linear-gradient(#c2185b, #c2185b);
+  --beam-color-bg: #fff8e1;
+  --beam-color-surface: #fff3c4;
+  --beam-color-panel: #ffecb3;
+  --beam-color-inverse-bg: #3e2723;
+  --beam-font-family: Georgia, serif;
+  --beam-icon-size: 28px;
+}

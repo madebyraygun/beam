@@ -19,5 +19,5 @@
     "useDefineForClassFields": false,
     "types": ["vite/client", "node", "vitest/globals"]
   },
-  "include": ["src", "preview", "theme-tests"]
+  "include": ["src", "preview", "e2e", "playwright.config.ts"]
 }

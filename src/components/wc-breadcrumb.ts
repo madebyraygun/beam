@@ -1,10 +1,11 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { controlsCss } from "../theme/index.js";
+import { baseCss } from "../theme/index.js";
+import { NAVIGATE_EVENT, PALETTE_OPEN_EVENT, emit } from "../events.js";
 import "./wc-monogram.js";
 import "../icons/icons.js";
 
-/** One level of the trail after the book. */
+/** One level of the trail after the workspace name. */
 export interface BreadcrumbItem {
   label: string;
   /**
@@ -14,10 +15,14 @@ export interface BreadcrumbItem {
   id?: string;
 }
 
-/** Which part of the palette a control asks for. */
-export type PaletteScope = "books" | "all";
+/**
+ * Which part of the palette a control asks for: `all` from the search box, the
+ * breadcrumb's `switch-scope` from the workspace name, or whatever an app puts
+ * on a status segment.
+ */
+export type PaletteScope = string;
 
-export interface NcPaletteOpenDetail {
+export interface PaletteOpenDetail {
   scope: PaletteScope;
 }
 
@@ -30,33 +35,27 @@ export function dispatchPaletteOpen(
   from: EventTarget,
   scope: PaletteScope,
 ): void {
-  from.dispatchEvent(
-    new CustomEvent<NcPaletteOpenDetail>("nc-palette-open", {
-      detail: { scope },
-      bubbles: true,
-      composed: true,
-    }),
-  );
+  emit<PaletteOpenDetail>(from, PALETTE_OPEN_EVENT, { scope });
 }
 
 /**
- * Where the user is: the open book, then the screen, then anything below it.
+ * Where the user is: the open workspace, then the screen, then anything below it.
  *
- * `[monogram] Book name ▾ / Screen`, or `… / Invoices / #1254` a level down.
- * The book is a button that asks for the palette scoped to books
- * (`nc-palette-open`); an earlier level is a button that navigates back to
- * its screen (`nc-navigate`), the same event the sidebar sends.
+ * `[monogram] Name ▾ / Screen`, or `… / Items / #12` a level down.
+ * The name is a button that asks for the palette at `switch-scope`
+ * (`beam-palette-open`); an earlier level is a button that navigates back to
+ * its screen (`beam-navigate`), the same event the sidebar sends.
  */
 @customElement("wc-breadcrumb")
 export class WcBreadcrumb extends LitElement {
   static styles = [
-    controlsCss,
+    baseCss,
     css`
       :host {
         display: block;
         min-width: 0;
-        font-family: var(--wa-font-family-sans);
-        font-size: var(--nc-font-size-control);
+        font-family: var(--beam-font-family);
+        font-size: var(--beam-font-size-control);
       }
 
       ol {
@@ -74,8 +73,8 @@ export class WcBreadcrumb extends LitElement {
         min-width: 0;
       }
 
-      /* Short of room, the book's name gives way before the screen's: the
-         monogram still says which book it is. */
+      /* Short of room, the workspace name gives way before the screen's:
+         the monogram still says which one it is. */
       li + li {
         flex-shrink: 0;
       }
@@ -86,42 +85,42 @@ export class WcBreadcrumb extends LitElement {
         min-width: 0;
         height: 30px;
         border: 0;
-        border-radius: var(--wa-radius-md);
+        border-radius: var(--beam-radius-md);
         background: transparent;
         font: inherit;
         cursor: default;
-        transition: background var(--nc-transition-fast);
+        transition: background var(--beam-transition-fast);
       }
 
       button:hover {
-        background: var(--nc-color-hover);
+        background: var(--beam-color-hover);
       }
 
-      .book {
-        gap: var(--wa-space-s);
+      .workspace {
+        gap: var(--beam-space-s);
         padding: 0 6px 0 4px;
-        color: var(--wa-color-text);
+        color: var(--beam-color-text);
       }
 
-      .book-name,
+      .workspace-name,
       .level {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
-      .book wc-icon-chevron-down {
-        --nc-icon-size: 14px;
-        color: var(--wa-color-muted);
+      .workspace wc-icon-chevron-down {
+        --beam-icon-size: 14px;
+        color: var(--beam-color-muted);
       }
 
       .sep {
         padding: 0 6px;
-        color: var(--wa-color-muted);
+        color: var(--beam-color-muted);
       }
 
       .level {
-        color: var(--wa-color-muted);
+        color: var(--beam-color-muted);
       }
 
       button.level {
@@ -129,10 +128,10 @@ export class WcBreadcrumb extends LitElement {
       }
 
       /* The last level of a deeper trail is the thing on screen, and reads
-         as text; a lone screen name stays muted beside the book. */
+         as text; a lone screen name stays muted beside the workspace name. */
       .level.current.deep {
-        color: var(--wa-color-text);
-        font-weight: var(--wa-font-weight-medium);
+        color: var(--beam-color-text);
+        font-weight: var(--beam-font-weight-medium);
       }
 
       @media print {
@@ -143,26 +142,28 @@ export class WcBreadcrumb extends LitElement {
     `,
   ];
 
-  /** The open book's name. */
-  @property({ type: String, attribute: "book-name" })
-  bookName = "";
+  /** The name of what is open. */
+  @property({ type: String, attribute: "workspace-name" })
+  workspaceName = "";
 
-  /** What picks the monogram's colour: something that names the book for good. */
-  @property({ type: String, attribute: "book-key" })
-  bookKey = "";
+  /** What picks the monogram's colour: something that names it for good. */
+  @property({ type: String, attribute: "workspace-key" })
+  workspaceKey = "";
 
-  /** The levels after the book, outermost first. */
+  /** The tooltip on the name. */
+  @property({ type: String, attribute: "switch-label" })
+  switchLabel = "Switch workspace";
+
+  /** The palette scope the name asks for. */
+  @property({ type: String, attribute: "switch-scope" })
+  switchScope: PaletteScope = "workspaces";
+
+  /** The levels after the name, outermost first. */
   @property({ attribute: false })
   trail: BreadcrumbItem[] = [];
 
   private navigate(id: string): void {
-    this.dispatchEvent(
-      new CustomEvent<{ id: string }>("nc-navigate", {
-        detail: { id },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    emit<{ id: string }>(this, NAVIGATE_EVENT, { id });
   }
 
   render() {
@@ -174,16 +175,17 @@ export class WcBreadcrumb extends LitElement {
           <li>
             <button
               type="button"
-              class="book"
+              class="workspace"
+              part="workspace"
               aria-haspopup="dialog"
-              title="Switch books"
-              @click=${(event: Event) => dispatchPaletteOpen(event.currentTarget as HTMLElement, "books")}
+              title=${this.switchLabel}
+              @click=${(event: Event) => dispatchPaletteOpen(event.currentTarget as HTMLElement, this.switchScope)}
             >
               <wc-monogram
-                name=${this.bookName}
-                seed=${this.bookKey}
+                name=${this.workspaceName}
+                seed=${this.workspaceKey}
               ></wc-monogram>
-              <span class="book-name">${this.bookName}</span>
+              <span class="workspace-name">${this.workspaceName}</span>
               <wc-icon-chevron-down></wc-icon-chevron-down>
             </button>
           </li>
@@ -198,6 +200,7 @@ export class WcBreadcrumb extends LitElement {
                     ? html`<button
                         type="button"
                         class=${classes}
+                        part="level"
                         data-level=${item.id}
                         @click=${() => this.navigate(item.id!)}
                       >
@@ -223,6 +226,6 @@ declare global {
     "wc-breadcrumb": WcBreadcrumb;
   }
   interface HTMLElementEventMap {
-    "nc-palette-open": CustomEvent<NcPaletteOpenDetail>;
+    [PALETTE_OPEN_EVENT]: CustomEvent<PaletteOpenDetail>;
   }
 }
