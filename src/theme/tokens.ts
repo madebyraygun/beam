@@ -49,6 +49,9 @@ export const TOKENS: readonly TokenSpec[] = [
   { name: '--beam-color-inverse-text', type: 'color', purpose: 'Text on an info toast.' },
   { name: '--beam-color-inverse-border', type: 'color', purpose: 'Edge of an info toast.' },
   { name: '--beam-color-inverse-hover', type: 'color', purpose: 'A toast button under the pointer.' },
+  { name: '--beam-color-field', type: 'color', purpose: 'The fill of a text field, select and textarea.' },
+  { name: '--beam-color-ring', type: 'color', purpose: 'The halo around a focused text field, outside its accent edge.' },
+  { name: '--beam-color-danger-ring', type: 'color', purpose: 'The halo around a field in error.' },
   { name: '--beam-color-on-tone', type: 'color', purpose: 'Initials on a monogram tile.' },
   ...tones,
   {
@@ -76,6 +79,12 @@ export const TOKENS: readonly TokenSpec[] = [
   { name: '--beam-space-s', type: 'length', purpose: 'Small gaps: inside the breadcrumb, the sidebar, between toasts.' },
   { name: '--beam-space-m', type: 'length', purpose: 'Banner padding, page heading gap.' },
   { name: '--beam-space-l', type: 'length', purpose: 'Inside a toast.' },
+
+  // Controls
+  { name: '--beam-control-height', type: 'length', purpose: 'A button, a select and the combobox field.' },
+  { name: '--beam-control-height-s', type: 'length', purpose: 'A small button (`size="s"`).' },
+  { name: '--beam-control-height-touch', type: 'length', purpose: 'A control sized for a finger (`size="touch"`), and a radio row on touch.' },
+  { name: '--beam-opacity-disabled', type: 'number', purpose: 'A disabled control.' },
 
   // Radius
   { name: '--beam-radius-xs', type: 'length', purpose: 'The status line monogram.' },

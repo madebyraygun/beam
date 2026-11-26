@@ -32,6 +32,9 @@ const light = css`
   --beam-color-inverse-text: #f5f5f5;
   --beam-color-inverse-border: rgb(255 255 255 / 12%);
   --beam-color-inverse-hover: rgb(255 255 255 / 16%);
+  --beam-color-field: #ffffff;
+  --beam-color-ring: rgb(37 99 235 / 22%);
+  --beam-color-danger-ring: rgb(185 28 28 / 18%);
   --beam-color-on-tone: #1f1f1f;
   --beam-tone-1: #d6e4f5;
   --beam-tone-2: #f5d6d6;
@@ -59,6 +62,11 @@ const light = css`
   --beam-space-s: 8px;
   --beam-space-m: 12px;
   --beam-space-l: 16px;
+
+  --beam-control-height: 32px;
+  --beam-control-height-s: 28px;
+  --beam-control-height-touch: 44px;
+  --beam-opacity-disabled: 0.4;
 
   --beam-radius-xs: 2px;
   --beam-radius-sm: 4px;
@@ -100,6 +108,9 @@ const dark = css`
   --beam-color-hover: #2a2a2a;
   --beam-color-selected: #1f2a40;
   --beam-color-overlay: rgb(0 0 0 / 50%);
+  --beam-color-field: #1b1b1b;
+  --beam-color-ring: rgb(122 167 255 / 25%);
+  --beam-color-danger-ring: rgb(252 165 165 / 22%);
   --beam-accent-image: linear-gradient(#7aa7ff, #7aa7ff);
   --beam-shadow-floating: 0 4px 16px rgb(0 0 0 / 40%);
   --beam-shadow-raised: 0 12px 32px rgb(0 0 0 / 55%);

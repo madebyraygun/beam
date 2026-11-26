@@ -20,7 +20,7 @@ one line in each app.
 | `beam/default-theme.css` | The default theme: every token, light and dark. Load it in the page, or load your own theme instead. |
 | `beam/theme` | `TOKENS` (the contract as data), `defaultTheme` (the same theme as a Lit style), `baseCss`, and the light and dark mode functions. |
 | `beam/events` | The event names (`NAVIGATE_EVENT` and the rest) and `EVENT_PREFIX`. |
-| `beam/components/<name>.js` | One component, registered on import: `beam-app-shell`, `beam-nav-sidebar`, `beam-breadcrumb`, `beam-status-line`, `beam-search-pill`, `beam-monogram`, `beam-toast`. |
+| `beam/components/<name>.js` | One component, registered on import: `beam-app-shell`, `beam-nav-sidebar`, `beam-breadcrumb`, `beam-status-line`, `beam-search-pill`, `beam-monogram`, `beam-toast`, and the controls: `beam-button`, `beam-input`, `beam-textarea`, `beam-select`, `beam-switch`, `beam-radio-group`, `beam-combobox`, `beam-dialog`. |
 | `beam/icons` | `BeamIconBase` and the six `beam-icon-*` elements the shell draws and both apps use: dashboard, flag, menu, refresh, chevron-down, search. |
 | `beam` | All of the above. Importing it registers every component. |
 
@@ -64,6 +64,32 @@ one line in each app.
   `EVENT_PREFIX` in `src/events.ts`, the one place it is written; listen with the exported
   names rather than the strings.
 
+## Controls
+
+The controls wrap the native elements, so the keyboard, the screen reader and the platform's
+pickers behave as they do for a plain `<input>` or `<select>`:
+
+- **In a form.** Each one is form-associated: give it a `name` and it is in `FormData`;
+  `form.reset()` puts back the value it started with; `required` and `error` make it invalid
+  so the form will not submit; a disabled `<fieldset>` disables it. Enter in a field submits
+  the form (⌘↵ or Ctrl↵ in a textarea). `beam-button type="submit"` and `type="reset"` act on
+  their form. A `change` event says the value was committed.
+- **Label, hint, error.** `label`, `hint` and `error` are properties. An error keeps the value
+  as typed and shows the message under the field; it does not snap back.
+- **Sizes.** `--beam-control-height`, with `size="s"` and `size="touch"` (44px) on a button
+  and a radio group.
+- **Select.** Options are `<option>` children. Where the engine has `appearance: base-select`
+  the open list is drawn from the theme; elsewhere it is the system's. `data-color` on an
+  option gives it a dot.
+- **Radio group.** `<option>` children too; `variant="segmented"` draws it as segments.
+- **Combobox.** `options` is a list of `{ value, label, group?, badge?, color? }`. Typing
+  filters; ↑↓ move, ↵ picks, Esc closes. The list is a popover in the top layer. `loading`,
+  `no-match` (with `{query}`) and `allow-free` cover fetching, no match and free text.
+- **Dialog.** The native `<dialog>`, modal. `show()`, `close()`, and `requestClose()`, which
+  sends a cancelable `cancel` first, as Escape does. `size="confirm"` (440) or `size="form"`
+  (620); buttons go in the `footer` slot, the primary one last; `autofocus` picks where focus
+  starts.
+
 ## Light and dark
 
 Three states as two classes on `<html>`: none follows the system, `light-mode` opts out of
@@ -106,6 +132,14 @@ There are three routes in, from lightest to heaviest, and one way round.
    | `beam-search-pill` | `button`, `keycap` |
    | `beam-monogram` | `tile` |
    | `beam-toast` | `toast`, `action`, `close` |
+   | `beam-button` | `button` |
+   | `beam-input` | `label`, `input`, `hint`, `error` |
+   | `beam-textarea` | `label`, `textarea`, `hint`, `error` |
+   | `beam-select` | `label`, `select`, `hint`, `error` |
+   | `beam-switch` | `row`, `switch`, `hint`, `error` |
+   | `beam-radio-group` | `fieldset`, `label`, `options`, `option`, `hint`, `error` |
+   | `beam-combobox` | `label`, `input`, `list`, `hint`, `error` |
+   | `beam-dialog` | `dialog`, `header`, `body`, `footer` |
 
    A part rule is written in the tree that holds the component, and reaches one shadow root
    down: a rule in the document styles a shell that sits in the document, and a rule in your
@@ -167,6 +201,9 @@ not a component's own knob. The default theme's values are in `src/theme/default
 | `--beam-color-inverse-text` | color | Text on an info toast. |
 | `--beam-color-inverse-border` | color | Edge of an info toast. |
 | `--beam-color-inverse-hover` | color | A toast button under the pointer. |
+| `--beam-color-field` | color | The fill of a text field, select and textarea. |
+| `--beam-color-ring` | color | The halo around a focused text field, outside its accent edge. |
+| `--beam-color-danger-ring` | color | The halo around a field in error. |
 | `--beam-color-on-tone` | color | Initials on a monogram tile. |
 | `--beam-tone-1` | color | Monogram tile fill number 1 of 7; a seed picks one. |
 | `--beam-tone-2` | color | Monogram tile fill number 2 of 7; a seed picks one. |
@@ -192,6 +229,10 @@ not a component's own knob. The default theme's values are in `src/theme/default
 | `--beam-space-s` | length | Small gaps: inside the breadcrumb, the sidebar, between toasts. |
 | `--beam-space-m` | length | Banner padding, page heading gap. |
 | `--beam-space-l` | length | Inside a toast. |
+| `--beam-control-height` | length | A button, a select and the combobox field. |
+| `--beam-control-height-s` | length | A small button (`size="s"`). |
+| `--beam-control-height-touch` | length | A control sized for a finger (`size="touch"`), and a radio row on touch. |
+| `--beam-opacity-disabled` | number | A disabled control. |
 | `--beam-radius-xs` | length | The status line monogram. |
 | `--beam-radius-sm` | length | The small monogram, toast buttons, a focused status segment. |
 | `--beam-radius-md` | length | Nav items, toggles, breadcrumb buttons, the banner, toasts, the large monogram. |
