@@ -46,8 +46,10 @@ one line in each app.
 - **Words are the app's.** The first breadcrumb level is "what is open": `workspace-name`
   and `workspace-key` (which picks its monogram colour). Its tooltip is `switch-label`
   (default "Switch workspace") and pressing it asks for the palette at `switch-scope`
-  (default `workspaces`). The search box's word is `label` on `beam-search-pill` (default
-  "Search"); the refresh button's is `refresh-label` on the shell (default "Refresh").
+  (default `workspaces`); with `no-switch` there is one workspace and the name is plain text.
+  The search box's word is `search-label` on the shell, or `label` on `beam-search-pill`
+  (default "Search"); the refresh button's is `refresh-label` on the shell (default
+  "Refresh").
 - **The product's name and mark.** `beam-nav-sidebar` draws `product-name` beside its toggle,
   and whatever is in its `mark` slot before it. With neither, it draws only the toggle.
 - **The status line.** `statusSegments` on the shell (or `segments` on `beam-status-line`) is

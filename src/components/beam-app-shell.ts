@@ -341,6 +341,14 @@ export class BeamAppShell extends LitElement {
   @property({ type: String, attribute: 'switch-label' })
   switchLabel = 'Switch workspace';
 
+  /** One workspace only: the breadcrumb's name is plain text. */
+  @property({ type: Boolean, attribute: 'no-switch' })
+  noSwitch = false;
+
+  /** The search pill's words. */
+  @property({ type: String, attribute: 'search-label' })
+  searchLabel = 'Search';
+
   /** The palette scope the name asks for. */
   @property({ type: String, attribute: 'switch-scope' })
   switchScope = 'workspaces';
@@ -488,11 +496,13 @@ export class BeamAppShell extends LitElement {
             workspace-key=${this.workspaceKey}
             switch-label=${this.switchLabel}
             switch-scope=${this.switchScope}
+            ?no-switch=${this.noSwitch}
             .trail=${this.trail}
           ></beam-breadcrumb>
           <slot name="header-end"></slot>
           <span class="spacer"></span>
           <beam-search-pill
+            label=${this.searchLabel}
             shortcut=${this.searchShortcut}
             key-shortcuts=${this.searchKeyShortcuts}
           ></beam-search-pill>
