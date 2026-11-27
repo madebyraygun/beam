@@ -147,6 +147,7 @@ export class BeamNavSidebar extends LitElement {
 
       ul {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
         gap: 1px;
         margin: 0;
         padding: 0;
