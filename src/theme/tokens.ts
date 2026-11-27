@@ -40,7 +40,7 @@ export const TOKENS: readonly TokenSpec[] = [
   { name: '--beam-color-on-accent', type: 'color', purpose: 'Text on a success or danger toast.' },
   { name: '--beam-color-focus', type: 'color', purpose: 'The keyboard focus outline on every control.' },
   { name: '--beam-color-success', type: 'color', purpose: 'A success toast; a status segment with tone `ok`.' },
-  { name: '--beam-color-warning', type: 'color', purpose: 'A nav item count; a status segment with tone `warning`.' },
+  { name: '--beam-color-warning', type: 'color', purpose: 'A nav item count or note; a status segment with tone `warning`.' },
   { name: '--beam-color-danger', type: 'color', purpose: 'A danger toast; a status segment with tone `danger`.' },
   { name: '--beam-color-hover', type: 'color', purpose: 'What a button or nav item sits on under the pointer.' },
   { name: '--beam-color-selected', type: 'color', purpose: 'The active nav item fill.' },

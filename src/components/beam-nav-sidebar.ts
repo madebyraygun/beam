@@ -18,6 +18,8 @@ export interface NavItem {
   group?: string;
   /** A figure drawn at the item's right edge, such as a queue length. Hidden at 0. */
   count?: number;
+  /** A few words in place of the figure, such as "1 blocking". Hidden when empty. */
+  note?: string;
   /** Drawn in the footer, below every group, rather than in the list. */
   pinned?: boolean;
 }
@@ -311,7 +313,7 @@ export class BeamNavSidebar extends LitElement {
         >
           ${this.renderIcon(item)}
           <span class="label">${item.label}</span>
-          ${count ? html`<span class="count">${count}</span>` : nothing}
+          ${item.note ? html`<span class="count">${item.note}</span>` : count ? html`<span class="count">${count}</span>` : nothing}
         </button>
       </li>
     `;

@@ -251,4 +251,13 @@ describe('beam-nav-sidebar on a phone', () => {
       /@media \(max-width: 48rem\)[\s\S]*:host\(\[collapsed\]\)[^{]*{[^}]*width:\s*var\(--beam-sidebar-width/,
     );
   });
+
+  it('draws a note in place of the count', async () => {
+    const el = document.createElement('beam-nav-sidebar') as HTMLElement & { items: unknown[]; updateComplete: Promise<unknown> };
+    el.items = [{ id: 'q', label: 'Open questions', note: '1 blocking', count: 3 }];
+    document.body.appendChild(el);
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.count')!.textContent).toBe('1 blocking');
+    el.remove();
+  });
 });

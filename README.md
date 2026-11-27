@@ -194,7 +194,7 @@ not a component's own knob. The default theme's values are in `src/theme/default
 | `--beam-color-on-accent` | color | Text on a success or danger toast. |
 | `--beam-color-focus` | color | The keyboard focus outline on every control. |
 | `--beam-color-success` | color | A success toast; a status segment with tone `ok`. |
-| `--beam-color-warning` | color | A nav item count; a status segment with tone `warning`. |
+| `--beam-color-warning` | color | A nav item count or note; a status segment with tone `warning`. |
 | `--beam-color-danger` | color | A danger toast; a status segment with tone `danger`. |
 | `--beam-color-hover` | color | What a button or nav item sits on under the pointer. |
 | `--beam-color-selected` | color | The active nav item fill. |
