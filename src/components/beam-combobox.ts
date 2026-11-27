@@ -13,6 +13,8 @@ export interface ComboOption {
   badge?: string;
   /** The tile's colour. */
   color?: string;
+  /** A few muted words at the end of the row, such as a role or an id. */
+  note?: string;
 }
 
 /** How many rows show before the list scrolls. */
@@ -108,6 +110,19 @@ export class BeamCombobox extends BeamField {
 
       [role='option'][aria-selected='true'] {
         background: var(--beam-color-selected);
+      }
+
+      [role='option'] .label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .note {
+        flex: none;
+        font-size: var(--beam-font-size-caption);
+        color: var(--beam-color-muted);
       }
 
       mark {
@@ -370,7 +385,7 @@ export class BeamCombobox extends BeamField {
           @pointerdown=${(e: Event) => e.preventDefault()}
           @click=${() => this.choose(option)}
         >
-          ${option.badge ? html`<span class="badge" aria-hidden="true" style=${option.color ? `background:${option.color}` : ''}>${option.badge}</span>` : nothing}<span>${this.labelOf(option)}</span>
+          ${option.badge ? html`<span class="badge" aria-hidden="true" style=${option.color ? `background:${option.color}` : ''}>${option.badge}</span>` : nothing}<span class="label">${this.labelOf(option)}</span>${option.note ? html`<span class="note">${option.note}</span>` : nothing}
         </div>`;
     });
     const body = this.loading
