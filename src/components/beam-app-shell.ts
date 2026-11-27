@@ -490,6 +490,7 @@ export class BeamAppShell extends LitElement {
             switch-scope=${this.switchScope}
             .trail=${this.trail}
           ></beam-breadcrumb>
+          <slot name="header-end"></slot>
           <span class="spacer"></span>
           <beam-search-pill
             shortcut=${this.searchShortcut}

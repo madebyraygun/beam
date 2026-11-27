@@ -39,6 +39,10 @@ export class BeamInput extends BeamField {
   @property({ type: Number })
   maxlength: number | undefined = undefined;
 
+  /** Shown and submitted, and not typed into: a value chosen another way, such as a folder. */
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
   /** What `form.reset()` puts back: the value the field started with. */
   private initial: string | null = null;
 
@@ -103,6 +107,7 @@ export class BeamInput extends BeamField {
         maxlength=${this.maxlength ?? nothing}
         ?disabled=${this.disabled}
         ?required=${this.required}
+        ?readonly=${this.readonly}
         aria-invalid=${this.error ? 'true' : 'false'}
         aria-describedby=${described || nothing}
         @input=${this.onInput}

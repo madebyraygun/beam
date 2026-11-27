@@ -148,7 +148,7 @@ There are three routes in, from lightest to heaviest, and one way round.
 
    | Component | Slots |
    | --- | --- |
-   | `beam-app-shell` | `sidebar`, `banner`, `page-actions`, and the default slot for the screen |
+   | `beam-app-shell` | `sidebar`, `banner`, `page-actions`, `header-end` (after the breadcrumb, such as a status dot), and the default slot for the screen |
    | `beam-nav-sidebar` | `mark`, before the product name |
    | `beam-status-line` | `start` and `end`, beside the segments on each side of the spacer |
 
