@@ -67,7 +67,8 @@ To change the look, set tokens in a rule that comes after the default theme:
 }
 ```
 
-A colour needs a dark value as well. [Theming](#theming) shows where it goes.
+A colour set like this is the same in light and dark. To give it a dark value, write both as
+`light-dark(light, dark)`, as [Theming](#theming) shows.
 
 ### Entry points
 
@@ -90,42 +91,63 @@ through shadow roots, so one rule in the page reaches every component.
 There are two ways to write one.
 
 - **Override the default.** Load `beam/default-theme.css`, then set the tokens you want to
-  change in a later rule, as in the quick start. The default theme sets most colours, the
-  accent image and the two shadows a second time for dark mode, under selectors that outrank
-  `:root`. To change one of those in the dark, set it under the two dark selectors shown
-  below.
+  change in a later `:root` rule, as in the quick start. A colour written as
+  `light-dark(light, dark)` follows the mode; a plain colour is the same in both. The two
+  shadows are the exception, as below.
 - **Replace the default.** Load your own stylesheet in its place. It must set every token in
   the [token reference](#token-reference) except the four
   [component tokens](#component-tokens). The components have no fallback values, so a token
   the theme leaves out has no value. `src/theme/default-theme.ts` is a complete theme to copy.
 
-A theme has three blocks:
+A theme is one block of tokens, plus the two classes that pin a mode:
 
 ```css
 :root {
   color-scheme: light dark;
-  --beam-color-bg: #f5f5f5;
-  --beam-color-text: #1f1f1f;
+  --beam-color-bg: light-dark(#f5f5f5, #161616);
+  --beam-color-text: light-dark(#1f1f1f, #ececec);
   /* ...every other token... */
 }
 
+:root.light-mode {
+  color-scheme: light;
+}
+
+:root.dark-mode {
+  color-scheme: dark;
+}
+```
+
+`light-dark()` gives its first colour where `color-scheme` is light and its second where it is
+dark. `color-scheme: light dark` follows the system, and the two classes pin it;
+[Colour mode](#colour-mode) explains them. `color-scheme` inherits into shadow roots, so every
+component picks the same side.
+
+`light-dark()` takes colours only, so a colour inside an image or a shadow uses it there:
+`linear-gradient(light-dark(#2563eb, #7aa7ff), light-dark(#2563eb, #7aa7ff))`, or
+`0 8px 24px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 35%))`.
+
+Anything else that changes in the dark, such as a shadow that grows, needs a dark value under
+both dark selectors: the system preference, unless the page has opted out, and the class
+that forces dark. The default theme does this for its two shadows:
+
+```css
 @media (prefers-color-scheme: dark) {
   :root:not(.light-mode) {
-    --beam-color-bg: #161616;
-    --beam-color-text: #ececec;
-    /* ...the tokens that change in the dark... */
+    --beam-shadow-floating: 0 4px 16px rgb(0 0 0 / 40%);
   }
 }
 
 :root.dark-mode {
-  --beam-color-bg: #161616;
-  --beam-color-text: #ececec;
-  /* ...the same dark values again... */
+  --beam-shadow-floating: 0 4px 16px rgb(0 0 0 / 40%);
 }
 ```
 
-The dark values appear twice because dark mode has two triggers: the system preference, and
-the `dark-mode` class that forces it. [Colour mode](#colour-mode) explains the classes.
+The dark selectors outrank `:root`, so a later `:root` rule does not reach a shadow's dark
+value. To change one, set it under the same two selectors.
+
+A script that reads a token with `getPropertyValue` gets the `light-dark(...)` text, not the
+colour on screen. Read a property that uses the token, such as `background-color`, instead.
 
 The default theme also sets the four motion tokens to zero under
 `@media (prefers-reduced-motion: reduce)`. A replacement theme should do the same.

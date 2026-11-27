@@ -5,36 +5,40 @@ import { css } from 'lit';
  * else gets working components. Neutral greys, one blue accent, the system
  * font. An app replaces it with its own theme rather than editing it.
  *
- * Dark values sit under both dark selectors: the system preference when the
- * page has not opted out (`.light-mode`), and `.dark-mode` to force it.
+ * Each colour is written once, as `light-dark(light, dark)`. `color-scheme`
+ * picks the side: `light dark` follows the system, and the `light-mode` and
+ * `dark-mode` classes pin it. The shadows are the exception: they grow in the
+ * dark, and `light-dark()` changes only colours, so their dark values sit
+ * under both dark selectors, the system preference when the page has not
+ * opted out (`.light-mode`) and `.dark-mode` to force it.
  */
-const light = css`
+const theme = css`
   color-scheme: light dark;
 
-  --beam-color-bg: #f5f5f5;
-  --beam-color-surface: #ffffff;
-  --beam-color-surface-alt: #f0f0f0;
-  --beam-color-panel: #fafafa;
-  --beam-color-border: #d4d4d4;
-  --beam-color-border-soft: #e5e5e5;
-  --beam-color-text: #1f1f1f;
-  --beam-color-muted: #5c5c5c;
-  --beam-color-accent: #2563eb;
-  --beam-color-on-accent: #ffffff;
-  --beam-color-focus: #2563eb;
-  --beam-color-success: #15803d;
-  --beam-color-warning: #a16207;
-  --beam-color-danger: #b91c1c;
-  --beam-color-hover: #ebebeb;
-  --beam-color-selected: #e6edfc;
-  --beam-color-overlay: rgb(0 0 0 / 20%);
+  --beam-color-bg: light-dark(#f5f5f5, #161616);
+  --beam-color-surface: light-dark(#ffffff, #222222);
+  --beam-color-surface-alt: light-dark(#f0f0f0, #262626);
+  --beam-color-panel: light-dark(#fafafa, #1d1d1d);
+  --beam-color-border: light-dark(#d4d4d4, #3a3a3a);
+  --beam-color-border-soft: light-dark(#e5e5e5, #2c2c2c);
+  --beam-color-text: light-dark(#1f1f1f, #ececec);
+  --beam-color-muted: light-dark(#5c5c5c, #a3a3a3);
+  --beam-color-accent: light-dark(#2563eb, #7aa7ff);
+  --beam-color-on-accent: light-dark(#ffffff, #161616);
+  --beam-color-focus: light-dark(#2563eb, #7aa7ff);
+  --beam-color-success: light-dark(#15803d, #86efac);
+  --beam-color-warning: light-dark(#a16207, #fcd34d);
+  --beam-color-danger: light-dark(#b91c1c, #fca5a5);
+  --beam-color-hover: light-dark(#ebebeb, #2a2a2a);
+  --beam-color-selected: light-dark(#e6edfc, #1f2a40);
+  --beam-color-overlay: light-dark(rgb(0 0 0 / 20%), rgb(0 0 0 / 50%));
   --beam-color-inverse-bg: #262626;
   --beam-color-inverse-text: #f5f5f5;
   --beam-color-inverse-border: rgb(255 255 255 / 12%);
   --beam-color-inverse-hover: rgb(255 255 255 / 16%);
-  --beam-color-field: #ffffff;
-  --beam-color-ring: rgb(37 99 235 / 22%);
-  --beam-color-danger-ring: rgb(185 28 28 / 18%);
+  --beam-color-field: light-dark(#ffffff, #1b1b1b);
+  --beam-color-ring: light-dark(rgb(37 99 235 / 22%), rgb(122 167 255 / 25%));
+  --beam-color-danger-ring: light-dark(rgb(185 28 28 / 18%), rgb(252 165 165 / 22%));
   --beam-color-on-tone: #1f1f1f;
   --beam-tone-1: #d6e4f5;
   --beam-tone-2: #f5d6d6;
@@ -43,7 +47,7 @@ const light = css`
   --beam-tone-5: #e4d6f5;
   --beam-tone-6: #ccecef;
   --beam-tone-7: #e6e6e6;
-  --beam-accent-image: linear-gradient(#2563eb, #2563eb);
+  --beam-accent-image: linear-gradient(light-dark(#2563eb, #7aa7ff), light-dark(#2563eb, #7aa7ff));
 
   --beam-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --beam-font-size-base: 14px;
@@ -90,35 +94,15 @@ const light = css`
   --beam-icon-size: 20px;
 `;
 
+/** What changes in the dark and is not a colour: the shadows grow. */
 const dark = css`
-  --beam-color-bg: #161616;
-  --beam-color-surface: #222222;
-  --beam-color-surface-alt: #262626;
-  --beam-color-panel: #1d1d1d;
-  --beam-color-border: #3a3a3a;
-  --beam-color-border-soft: #2c2c2c;
-  --beam-color-text: #ececec;
-  --beam-color-muted: #a3a3a3;
-  --beam-color-accent: #7aa7ff;
-  --beam-color-on-accent: #161616;
-  --beam-color-focus: #7aa7ff;
-  --beam-color-success: #86efac;
-  --beam-color-warning: #fcd34d;
-  --beam-color-danger: #fca5a5;
-  --beam-color-hover: #2a2a2a;
-  --beam-color-selected: #1f2a40;
-  --beam-color-overlay: rgb(0 0 0 / 50%);
-  --beam-color-field: #1b1b1b;
-  --beam-color-ring: rgb(122 167 255 / 25%);
-  --beam-color-danger-ring: rgb(252 165 165 / 22%);
-  --beam-accent-image: linear-gradient(#7aa7ff, #7aa7ff);
   --beam-shadow-floating: 0 4px 16px rgb(0 0 0 / 40%);
   --beam-shadow-raised: 0 12px 32px rgb(0 0 0 / 55%);
 `;
 
 export const defaultTheme = css`
   :root {
-    ${light}
+    ${theme}
   }
 
   @media (prefers-color-scheme: dark) {

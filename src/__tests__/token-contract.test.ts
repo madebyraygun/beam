@@ -56,8 +56,15 @@ describe('the token contract', () => {
     expect([...filled].filter((name) => !TOKEN_NAMES.has(name))).toEqual([]);
   });
 
+  it('sets each colour once: one that changes in the dark is one light-dark() value', () => {
+    const names = [...defaultTheme.cssText.matchAll(/(--beam-[\w-]+)\s*:/g)].map((m) => m[1]);
+    const colours = new Set<string>(TOKENS.filter((t) => t.type === 'color' || t.type === 'image').map((t) => t.name));
+    expect(names.filter((name, i) => colours.has(name) && names.indexOf(name) !== i)).toEqual([]);
+    expect(lightBlock).toMatch(/--beam-color-bg:\s*light-dark\(/);
+  });
+
   it('is the README’s token table, row for row', () => {
-    const rows = [...readme.matchAll(/^\| `(--beam-[\w-]+)` \| (\w[\w-]*) \|/gm)].map((m) => `${m[1]} ${m[2]}`);
-    expect(rows).toEqual(TOKENS.map((t) => `${t.name} ${t.type}`));
+    const rows = [...readme.matchAll(/^\| `(--beam-[\w-]+)` \| (\w[\w-]*) \| (.*) \|$/gm)].map((m) => `${m[1]} ${m[2]} ${m[3]}`);
+    expect(rows).toEqual(TOKENS.map((t) => `${t.name} ${t.type} ${t.purpose}`));
   });
 });
