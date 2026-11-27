@@ -97,6 +97,8 @@ export class BeamBreadcrumb extends LitElement {
       }
 
       .workspace {
+        display: inline-flex;
+        align-items: center;
         gap: var(--beam-space-s);
         padding: 0 6px 0 4px;
         color: var(--beam-color-text);
