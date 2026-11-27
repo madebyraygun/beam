@@ -97,6 +97,8 @@ export class BeamBreadcrumb extends LitElement {
       }
 
       .workspace {
+        display: inline-flex;
+        align-items: center;
         gap: var(--beam-space-s);
         padding: 0 6px 0 4px;
         color: var(--beam-color-text);
@@ -154,6 +156,10 @@ export class BeamBreadcrumb extends LitElement {
   @property({ type: String, attribute: "switch-label" })
   switchLabel = "Switch workspace";
 
+  /** One workspace only: its name is plain text, with nothing to switch to. */
+  @property({ type: Boolean, attribute: "no-switch" })
+  noSwitch = false;
+
   /** The palette scope the name asks for. */
   @property({ type: String, attribute: "switch-scope" })
   switchScope: PaletteScope = "workspaces";
@@ -173,7 +179,12 @@ export class BeamBreadcrumb extends LitElement {
       <nav aria-label="Breadcrumb">
         <ol>
           <li>
-            <button
+            ${this.noSwitch
+              ? html`<span class="workspace" part="workspace"
+                  ><beam-monogram name=${this.workspaceName} seed=${this.workspaceKey}></beam-monogram
+                  ><span class="workspace-name">${this.workspaceName}</span></span
+                >`
+              : html`<button
               type="button"
               class="workspace"
               part="workspace"
@@ -187,7 +198,7 @@ export class BeamBreadcrumb extends LitElement {
               ></beam-monogram>
               <span class="workspace-name">${this.workspaceName}</span>
               <beam-icon-chevron-down></beam-icon-chevron-down>
-            </button>
+            </button>`}
           </li>
           ${this.trail.map((item, index) => {
             const current = index === last;

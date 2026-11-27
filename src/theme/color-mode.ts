@@ -1,13 +1,17 @@
 /**
  * Light and dark mode: three states as two classes on `<html>`.
  *
- * - no class     — follow the system, via `@media (prefers-color-scheme: dark)`
- * - `light-mode` — opt out of that media query
- * - `dark-mode`  — force dark
+ * - no class     — follow the system: the theme's `color-scheme: light dark`
+ * - `light-mode` — force light: `color-scheme: light`
+ * - `dark-mode`  — force dark: `color-scheme: dark`
  *
  * `system` writes no class, so the page follows an OS change live with no
- * listener: the browser re-evaluates the media query itself. A theme puts its
- * dark values under both selectors (see `src/theme/default-theme.ts`).
+ * listener: the browser picks the side of every `light-dark()` colour itself.
+ * A theme writes each colour once as `light-dark(light, dark)` (see
+ * `src/theme/default-theme.ts`).
+ *
+ * `resolveMode` and `darkModeQuery` ask `(prefers-color-scheme: dark)`,
+ * which is what `system` means.
  *
  * Where the choice is kept is the app's: every function that reads or writes it
  * takes the storage key, and the package has none of its own, so two apps on

@@ -7,9 +7,9 @@ axe.configure({
   rules: [{ id: 'region', enabled: false }],
 });
 
-// jsdom implements only part of ElementInternals. Web Awesome form controls
-// call the missing members during their first update and would otherwise throw
-// unhandled rejections in every test that mounts one.
+// jsdom implements only part of ElementInternals. beam's form controls (field.ts,
+// beam-button) call the missing members during their first update and would
+// otherwise throw unhandled rejections in every test that mounts one.
 {
   const EI = (globalThis as Record<string, unknown>)['ElementInternals'] as
     | { prototype: Record<string, unknown> }
@@ -77,19 +77,6 @@ if (typeof window !== 'undefined' && window.HTMLDialogElement) {
     dialogProto.close = function (this: HTMLDialogElement) {
       this.open = false;
     };
-  }
-}
-
-// jsdom implements no Web Animations API. Web Awesome awaits getAnimations()
-// on every dialog show/hide from a requestAnimationFrame callback, where a
-// throw escapes as an uncaught exception rather than a rejected test. An empty
-// list reads as "nothing is animating", which is true here.
-if (typeof window !== 'undefined' && window.Element) {
-  const proto = window.Element.prototype as Element & {
-    getAnimations?: () => Animation[];
-  };
-  if (typeof proto.getAnimations !== 'function') {
-    proto.getAnimations = () => [];
   }
 }
 

@@ -1,8 +1,8 @@
 {
   "name": "@madebyraygun/beam",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "beam: the application shell (frame, sidebar, breadcrumb, status line, search box, monogram, toast) and icons as Lit components, styled through a documented token contract",
+  "description": "beam: Lit components for an application shell (frame, sidebar, breadcrumb, status line, search box, monogram, toast), form controls (button, input, textarea, select, combobox, radio group, switch, dialog) and icons, styled through a documented token contract",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
@@ -39,7 +39,8 @@
     "!src/**/*.test.ts",
     "!src/**/*.preview.ts",
     "!src/**/__tests__",
-    "!src/**/__mocks__"
+    "!src/**/__mocks__",
+    "!src/test-setup.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/build-css.js",
